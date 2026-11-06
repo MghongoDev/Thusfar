@@ -4,7 +4,7 @@ Teams make decisions in chat, and the chat scrolls them away. Agents in the same
 
 Thusfar is a [Switch](https://switchagents.ai) room with two agents. When the build is done, the **scribe** will write each decision to a decision log, and the **builder** will do tasks, but read the log first and challenge any request that breaks an active decision. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
 
-> **Status: Phases 2 and 3 in progress.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task and posts its work as files; its challenges are next. See [Status](#status).
+> **Status: Phase 2 of 5 done; Phase 3 in progress.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task and posts its work as files; its challenges are next. See [Status](#status).
 
 ## Quick start
 
@@ -55,7 +55,7 @@ The build follows the spec in [issue #1](https://github.com/MghongoDev/Thusfar/i
 | Phase | Issue | State |
 |---|---|---|
 | 1. Two agents and one room from a template | [#2](https://github.com/MghongoDev/Thusfar/issues/2) | Done |
-| 2. The scribe records decisions | [#3](https://github.com/MghongoDev/Thusfar/issues/3) | In progress |
+| 2. The scribe records decisions | [#3](https://github.com/MghongoDev/Thusfar/issues/3) | Done |
 | 3. The builder checks and challenges | [#4](https://github.com/MghongoDev/Thusfar/issues/4) | In progress |
 | 4. Scenario tests through the room | [#5](https://github.com/MghongoDev/Thusfar/issues/5) | Not started |
 | 5. README, demo, and submission | [#6](https://github.com/MghongoDev/Thusfar/issues/6) | Not started |
