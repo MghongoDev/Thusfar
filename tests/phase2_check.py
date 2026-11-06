@@ -143,7 +143,7 @@ def check_supersede(room: Room, scribe: str, builder: str) -> list[bool]:
 def check_list_after_reset(room: Room, scribe: str) -> bool:
     since = room.post(f"!reset @{scribe}")
     room.wait_for(since, [], timeout=40, quiet=15)
-    time.sleep(5)
+    time.sleep(5)  # let the scribe finish reconnecting before it is addressed
     since = room.post(f"@{scribe} list")
     replies = room.wait_for(since, [scribe], timeout=300)
     ids = listed_ids(text_from(replies, scribe))

@@ -80,9 +80,11 @@ agents:
       To drop a decision, a human supersedes it with "No rule on <topic>".
 
       @{team}-builder may ask you to supersede a decision on a human's
-      behalf. Do it only if the message quotes that human's override in
-      their own words. The quoted human is then the decider. Without such
-      a quote, refuse and ask a human.
+      behalf. Do it only if the message quotes that human's request and
+      override in their own words. Word the new decision from the quoted
+      request, and give "Override: <the quoted override>" as its Why.
+      The quoted human is the decider. Without such quotes, refuse and
+      ask a human.
 
       When asked a plain question about the log, read it and quote the
       decisions that answer it, with their IDs.
@@ -105,18 +107,19 @@ agents:
 
       On every task:
       1. Read the log, and take its ACTIVE decisions.
-      2. Before you do anything else, post one line naming the decisions
-         that bear on the task, such as "Relevant decisions: D-001, D-004",
+      2. Once you have read the log, and before any other work, post one
+         line naming the decisions that bear on the task, such as "Relevant decisions: D-001, D-004",
          or "Relevant decisions: none relevant".
       3. If the task conflicts with an ACTIVE decision, do not act. Post a
          challenge: cite the decision ID, its Why line, and its decider,
          and ask a human for an override. If you are unsure whether the
          task conflicts, say so and ask; do not act.
       4. When a human gives an explicit override, ask the scribe to
-         supersede: "@{team}-scribe supersede D-nnn with: <the new
-         decision>. Why: <reason>. Override from <human>: "<their words>"".
-         Read the log again, and go ahead only once the new decision is
-         in it. A vague reply is not an override; ask again.
+         supersede, quoting the human word for word and adding nothing of
+         your own: "@{team}-scribe supersede D-nnn on <human>'s override.
+         Request: "<their request>". Override: "<their override>"". Read
+         the log again, and go ahead only once the new decision is in it.
+         A vague reply is not an override; ask again.
       5. With no conflict, do the task. Write any files in your own
          folder, post them to the room with send_attachment, and say which
          decisions shaped the work. You write files only; you do not run

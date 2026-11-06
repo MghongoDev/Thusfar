@@ -6,8 +6,8 @@
 2. Asked for work no decision covers, it says "none relevant" and does
    the task.
 
-Run this in a room made fresh from the template, so the log holds the
-seed decisions.
+Run this in a room made from the template where D-001 and D-004 are still
+active: a fresh room, or one the Phase 2 checks have just run in.
 
 Usage: python3 tests/phase3_check.py --team <team of a fresh room>
 
@@ -19,13 +19,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from driver import Room, files_from, report, text_from
-
-
-def is_message(text: str) -> bool:
-    """A real message, not one of Switch's progress lines."""
-    t = text.strip()
-    return bool(t) and not t.startswith("**Worked for") and not t.startswith("Starting a session")
+from driver import Room, files_from, is_message, report, text_from
 
 
 def check_orders_migration(room: Room, builder: str) -> list[bool]:

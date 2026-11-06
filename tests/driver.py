@@ -8,7 +8,7 @@ Settings come from `.env.local` at the repo root, which git ignores:
 MM_URL, and either MM_TOKEN (a personal access token) or MM_USER and
 MM_PASSWORD.
 
-Issues: #7 (Phase 1 close-out, part of #2). Reused by #5 (Phase 4). ADR: 0001.
+Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files. Reused by #5 (Phase 4). ADR: 0001.
 """
 
 from __future__ import annotations
@@ -167,6 +167,12 @@ def _file_names(post: dict) -> tuple[str, ...]:
     if files:
         return tuple(f.get("name", "") for f in files)
     return tuple("(unnamed file)" for _ in post.get("file_ids") or [])
+
+
+def is_message(text: str) -> bool:
+    """A real message, not one of Switch's progress lines."""
+    t = text.strip()
+    return bool(t) and not t.startswith("**Worked for") and not t.startswith("Starting a session")
 
 
 def files_from(replies: list[Reply], agent: str) -> list[str]:

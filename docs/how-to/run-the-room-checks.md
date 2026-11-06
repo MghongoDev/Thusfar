@@ -33,10 +33,10 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/phase2_check.py --team check1
    ```
 
-3. Run the Phase 3 checks in another fresh room, such as `check2`. The builder writes files and posts them:
+3. Run the Phase 3 checks in the same room, after the Phase 2 checks, or in another fresh room. They need D-001 and D-004 to be active. The builder writes files and posts them:
 
    ```bash
-   python3 tests/phase3_check.py --team check2
+   python3 tests/phase3_check.py --team check1
    ```
 
 Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
@@ -48,6 +48,8 @@ Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits w
 | Both agents reply | Each agent answers a hello under its own name. |
 | The scribe creates the room document | The scribe names a new room document, such as `CHECK-3F9A1C`, in its reply. Each run picks a new name, so the scribe must create the document, not update one. |
 | The builder reads the room document after `!reset` | With its context cleared, the builder names the secret word the scribe wrote in the document. The word never appears in the chat, so the builder can only have read it from the document. |
+
+Each Phase 1 run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
 
 ## What the Phase 2 checks do
 
@@ -71,7 +73,6 @@ The Phase 2 checks add D-005 to D-007 to the log and supersede D-005.
 | The builder posts the migration | The builder posts a `.sql` file and says which decisions shaped it. |
 | None relevant | Asked for a `.gitignore` for a Python project, the builder says "none relevant" and posts the file. |
 
-Each Phase 1 run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
 
 ## If something goes wrong
 

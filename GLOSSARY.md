@@ -41,12 +41,16 @@ To add a new decision to the log, at a human's request: `@<team>-scribe record: 
 _Avoid_: log, save, note, capture
 
 **List**:
-The scribe's reply that shows every active decision, one per line: `@<team>-scribe list`.
+To show every active decision, one per line, at a human's request: `@<team>-scribe list`.
 _Avoid_: dump, summary, report
 
 **Supersede**:
 To replace an active decision with a new one that names it. The old decision stays in the log.
 _Avoid_: edit, update, overwrite
+
+**No rule on**:
+The fixed wording of a decision that drops another: superseding D-005 with "No rule on table naming" leaves the topic open. It is the one place the log uses the word "rule".
+_Avoid_: revoke, delete, cancel
 
 **Decider**:
 The human who made a decision or gave the override that produced it. Never an agent.
@@ -57,6 +61,10 @@ _Avoid_: owner, author, approver
 **Conflict**:
 A request that would break an active decision if the builder carried it out.
 _Avoid_: violation, clash
+
+**Relevant decisions line**:
+The builder's first message on a task, naming the decisions that bear on it, such as `Relevant decisions: D-001, D-004`, or `Relevant decisions: none relevant`.
+_Avoid_: preamble, check summary
 
 **Challenge**:
 The builder's refusal to act on a conflict. It cites the decision ID, the reason, and the decider, then asks a human for an override.
