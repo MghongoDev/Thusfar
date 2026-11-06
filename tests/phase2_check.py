@@ -7,15 +7,19 @@
    with the human who asked as the decider.
 4. `record` without a reason makes the scribe ask for one, and it writes
    nothing until it has the reason. Then it records the decision.
+5. `list` shows every active decision and no superseded one.
+6. `supersede` with "No rule on <topic>" adds the next decision ID and
+   marks the old decision SUPERSEDED, naming its replacement.
+7. After `!reset` of the scribe, `list` shows the same decision IDs.
 
 The log is read through the builder, which loads the room document. Run
 this in a room made fresh from the template, never in a demo room: the
 checks expect the seed decisions and nothing after them, and they add
-D-005 and D-006.
+D-005 to D-007, and supersede D-005.
 
 Usage: python3 tests/phase2_check.py --team <team of a fresh room>
 
-Issues: #9 (part of #3). ADR: 0001.
+Issues: #9 and #10 (part of #3). ADR: 0001.
 """
 
 from __future__ import annotations
@@ -23,6 +27,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import time
 
 from driver import REPO, Room, report, text_from
 
@@ -96,6 +101,57 @@ def check_record_without_reason(room: Room, scribe: str, builder: str) -> list[b
     return [asks, waited, ok]
 
 
+def listed_ids(text: str) -> set[str]:
+    return set(re.findall(r"D-\d{3}", text))
+
+
+def check_list(room: Room, scribe: str) -> bool:
+    since = room.post(f"@{scribe} list")
+    replies = room.wait_for(since, [scribe], timeout=300)
+    ids = listed_ids(text_from(replies, scribe))
+    ok = ids == {"D-001", "D-002", "D-003", "D-004", "D-005", "D-006"}
+    report(f"list shows the six active decisions (saw {sorted(ids)})", ok, replies)
+    return ok
+
+
+def check_supersede(room: Room, scribe: str, builder: str) -> list[bool]:
+    since = room.post(
+        f"@{scribe} supersede D-005 with: No rule on table naming. "
+        f"Why: the team wants to choose per project."
+    )
+    replies = room.wait_for(since, [scribe], timeout=300)
+    said = text_from(replies, scribe)
+    added = "D-007 | ACTIVE" in said and "No rule on table naming" in said and "Supersedes: D-005" in said
+    report("supersede adds D-007, which supersedes D-005", added, replies)
+
+    since = room.post(
+        f"@{builder} quote D-005 and D-007 from the room document named DECISIONS, exactly as written, and nothing else."
+    )
+    quoted = room.wait_for(since, [builder], timeout=300)
+    log = flat(text_from(quoted, builder))
+    marked = "d-005 | superseded by d-007" in log and "snake_case" in log and "d-007 | active" in log
+    report("the log keeps D-005, marked SUPERSEDED by D-007", marked, quoted)
+
+    since = room.post(f"@{scribe} list")
+    listed = room.wait_for(since, [scribe], timeout=300)
+    ids = listed_ids(text_from(listed, scribe))
+    dropped = "D-005" not in ids and "D-007" in ids
+    report(f"list no longer shows D-005 (saw {sorted(ids)})", dropped, listed)
+    return [added, marked, dropped]
+
+
+def check_list_after_reset(room: Room, scribe: str) -> bool:
+    since = room.post(f"!reset @{scribe}")
+    room.wait_for(since, [], timeout=40, quiet=15)
+    time.sleep(5)
+    since = room.post(f"@{scribe} list")
+    replies = room.wait_for(since, [scribe], timeout=300)
+    ids = listed_ids(text_from(replies, scribe))
+    ok = ids == {"D-001", "D-002", "D-003", "D-004", "D-006", "D-007"}
+    report(f"after !reset, list shows the same decision IDs (saw {sorted(ids)})", ok, replies)
+    return ok
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--team", required=True, help="team of a room made fresh from the template")
@@ -107,6 +163,9 @@ def main() -> int:
         check_seeded_log(room, builder),
         check_record_with_reason(room, scribe),
         *check_record_without_reason(room, scribe, builder),
+        check_list(room, scribe),
+        *check_supersede(room, scribe, builder),
+        check_list_after_reset(room, scribe),
     ]
     return 0 if all(results) else 1
 

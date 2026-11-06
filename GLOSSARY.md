@@ -40,6 +40,10 @@ _Avoid_: confirmation, approval, exception
 To add a new decision to the log, at a human's request: `@<team>-scribe record: <decision>`.
 _Avoid_: log, save, note, capture
 
+**List**:
+The scribe's reply that shows every active decision, one per line: `@<team>-scribe list`.
+_Avoid_: dump, summary, report
+
 **Supersede**:
 To replace an active decision with a new one that names it. The old decision stays in the log.
 _Avoid_: edit, update, overwrite

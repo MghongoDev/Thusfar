@@ -27,10 +27,16 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/phase1_check.py --team thusfar
    ```
 
-   Run the Phase 2 checks in a room made fresh from the template, with its own `team` value such as `check1`. They expect the seed decisions and nothing after them, and they add D-005 and D-006, so never run them in your demo room:
+   Run the Phase 2 checks in a room made fresh from the template, with its own `team` value such as `check1`. They expect the seed decisions and nothing after them, and they add D-005 to D-007, so never run them in your demo room:
 
    ```bash
    python3 tests/phase2_check.py --team check1
+   ```
+
+3. Run the Phase 3 checks in another fresh room, such as `check2`. The builder writes files and posts them:
+
+   ```bash
+   python3 tests/phase3_check.py --team check2
    ```
 
 Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
@@ -51,8 +57,19 @@ Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits w
 | The log holds the seed decisions | The builder quotes D-001 to D-004 from `DECISIONS`, all active, worded as in the template's kickoff, decided by David, and nothing after them. |
 | `record` with a reason | The scribe adds D-005 and repeats it back, active, with you as decider and a date. |
 | `record` without a reason | The scribe asks why, and the log still ends at D-005 while it waits. Given the reason, it records D-006. |
+| `list` | The scribe lists D-001 to D-006, the active decisions. |
+| `supersede` | Superseding D-005 with "No rule on table naming" adds D-007. The log keeps D-005, marked `SUPERSEDED by D-007`, and `list` no longer shows it. |
+| `list` after `!reset` | With its context cleared, the scribe lists the same decision IDs. |
 
-The Phase 2 checks add D-005 and D-006 to the log.
+The Phase 2 checks add D-005 to D-007 to the log and supersede D-005.
+
+## What the Phase 3 checks do
+
+| Check | Passes when |
+|---|---|
+| The builder names the decisions first | Asked for the Postgres migration for an `orders` table, the builder's first message names D-001 and D-004, before any file. |
+| The builder posts the migration | The builder posts a `.sql` file and says which decisions shaped it. |
+| None relevant | Asked for a `.gitignore` for a Python project, the builder says "none relevant" and posts the file. |
 
 Each Phase 1 run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
 

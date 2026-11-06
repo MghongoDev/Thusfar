@@ -52,6 +52,7 @@ class Reply:
     author: str
     text: str
     at: int  # Mattermost create_at, in milliseconds
+    files: tuple[str, ...] = ()  # names of files attached to the post
 
 
 class Room:
@@ -128,7 +129,7 @@ class Room:
         data = self._get(f"/channels/{self.channel['id']}/posts?since={since}")
         posts = [data["posts"][pid] for pid in data["order"]]
         out = [
-            Reply(self._author(p), p["message"], p["create_at"])
+            Reply(self._author(p), p["message"], p["create_at"], _file_names(p))
             for p in posts
             if p["create_at"] > since and p["user_id"] != self.me["id"] and p.get("type", "") == ""
         ]
@@ -159,6 +160,18 @@ class Room:
                 break
             time.sleep(poll)
         return replies
+
+
+def _file_names(post: dict) -> tuple[str, ...]:
+    files = (post.get("metadata") or {}).get("files") or []
+    if files:
+        return tuple(f.get("name", "") for f in files)
+    return tuple("(unnamed file)" for _ in post.get("file_ids") or [])
+
+
+def files_from(replies: list[Reply], agent: str) -> list[str]:
+    """Names of every file one agent posted."""
+    return [name for r in replies if r.author == agent for name in r.files]
 
 
 def text_from(replies: list[Reply], agent: str) -> str:

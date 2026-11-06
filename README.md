@@ -4,7 +4,7 @@ Teams make decisions in chat, and the chat scrolls them away. Agents in the same
 
 Thusfar is a [Switch](https://switchagents.ai) room with two agents. When the build is done, the **scribe** will write each decision to a decision log, and the **builder** will do tasks, but read the log first and challenge any request that breaks an active decision. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
 
-> **Status: Phase 2 of 5 in progress.** One template creates both agents and the room, with four seed decisions in the log. The scribe records new decisions; `list` and `supersede` come next. The builder's checks are still bare. See [Status](#status).
+> **Status: Phases 2 and 3 in progress.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task and posts its work as files; its challenges are next. See [Status](#status).
 
 ## Quick start
 
@@ -29,8 +29,8 @@ You (a human, in Mattermost)
 ```
 
 - The room holds the log. It is a room document named `DECISIONS`.
-- Only the scribe writes to it. Switch lets only the agent that made a document change it ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)). The kickoff fills it with four seed decisions, and `@thusfar-scribe record:` adds more.
-- The builder reads the log before every task. Its checks and challenges arrive in Phase 3.
+- Only the scribe writes to it. Switch lets only the agent that made a document change it ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)). The kickoff fills it with four seed decisions. `@thusfar-scribe record:` adds a decision, `list` shows the active ones, and `supersede D-nnn with:` replaces one.
+- The builder reads the log before every task and names the decisions that bear on it. It challenges a conflicting request and asks a human for an override; the tests for that arrive with the rest of Phase 3.
 
 [How Thusfar works](docs/explanation/how-thusfar-works.md) explains the design.
 
@@ -56,7 +56,7 @@ The build follows the spec in [issue #1](https://github.com/MghongoDev/Thusfar/i
 |---|---|---|
 | 1. Two agents and one room from a template | [#2](https://github.com/MghongoDev/Thusfar/issues/2) | Done |
 | 2. The scribe records decisions | [#3](https://github.com/MghongoDev/Thusfar/issues/3) | In progress |
-| 3. The builder checks and challenges | [#4](https://github.com/MghongoDev/Thusfar/issues/4) | Not started |
+| 3. The builder checks and challenges | [#4](https://github.com/MghongoDev/Thusfar/issues/4) | In progress |
 | 4. Scenario tests through the room | [#5](https://github.com/MghongoDev/Thusfar/issues/5) | Not started |
 | 5. README, demo, and submission | [#6](https://github.com/MghongoDev/Thusfar/issues/6) | Not started |
 

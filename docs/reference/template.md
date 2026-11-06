@@ -28,8 +28,8 @@ Both agents keep the default `auto_mode: true`. Safe actions run without asking.
 | Where | Holds |
 |---|---|
 | Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, that only humans decide, the decision format, the two states, that a written decision is never edited, what counts as an override, and "if unsure, ask". |
-| Scribe `instructions` | The scribe's role, and the steps for `record`: next decision ID, ask once for a missing reason, the human as decider, repeat the entry back. |
-| Builder `instructions` | The builder's role, and how to read the log with `list_references` and `load_internal_documents`. |
+| Scribe `instructions` | The scribe's role, and the steps for its commands. `record`: next decision ID, ask once for a missing reason, the human as decider, repeat the decision back. `list`: the active decisions, one per line. `supersede`: a new decision that names the old one, whose state line becomes `SUPERSEDED by` the new ID. The scribe supersedes for the builder only when it quotes a human's override. |
+| Builder `instructions` | The builder's role, how to read the log with `list_references` and `load_internal_documents`, and its five steps on every task: read the active decisions, name the relevant ones first, challenge a conflict, pass a human's override to the scribe, and otherwise do the task and post its files with `send_attachment`. |
 
 ## Names a run must not reuse
 

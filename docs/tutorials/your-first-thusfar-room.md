@@ -45,3 +45,11 @@ A room with two agents that know their roles, and a decision log that holds four
 | D-004 | Store all dates and times in UTC. |
 
 To add one, write `@thusfar-scribe record: <decision>. Why: <reason>`. The scribe gives it the next decision ID and repeats it back.
+
+## 4. Ask the builder for work
+
+Write `@thusfar-builder write the Postgres migration that creates an orders table.` The builder first names the decisions that bear on the task, here D-001 and D-004. Then it writes the migration and posts it to the room as a `.sql` file.
+
+## 5. Change your mind
+
+Write `@thusfar-scribe list` to see the active decisions. To replace one, write `@thusfar-scribe supersede D-002 with: <new decision>. Why: <reason>`. The old decision stays in the log, marked `SUPERSEDED` by the new one, and `list` no longer shows it.
