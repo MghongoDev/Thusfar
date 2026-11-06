@@ -6,7 +6,7 @@ Switch has no native Rules or Decisions feature. Room documents come closest: ev
 
 Switch lets only the agent that created a document change it. That fixes the scribe as the one writer. When a human gives an override, the builder asks the scribe to supersede and quotes the human's words, and the scribe records that human as the decider.
 
-We do not seed the log through the template's `room.docs` list. A document made that way has no agent creator, so no agent could update it later. The kickoff message asks the scribe to put the seed decisions in the document instead, creating it if it does not exist. The scribe sometimes creates an empty log when it first says hello; the kickoff then fills that one, so the room never holds two logs. Because a human posts the kickoff, the seed decisions have a human decider.
+We do not seed the log through the template's `room.docs` list. A document made that way has no agent creator, so no agent could update it later. The kickoff message asks the scribe to put the seed decisions in the document instead ([#9](https://github.com/MghongoDev/Thusfar/issues/9)). It says to fill the document if it exists and create it if not, so the room never holds two logs. The seed decisions name David, who made them on 2026-11-06, as their decider, whoever runs the template. A decision recorded later names the human who asked for it, under the name the room shows for them.
 
 ## Considered options
 

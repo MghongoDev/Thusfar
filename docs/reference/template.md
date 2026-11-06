@@ -27,7 +27,7 @@ Both agents keep the default `auto_mode: true`. Safe actions run without asking.
 
 | Where | Holds |
 |---|---|
-| Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, that only humans decide, the decision format, the two states, what counts as an override, and "if unsure, ask". |
+| Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, that only humans decide, the decision format, the two states, that a written decision is never edited, what counts as an override, and "if unsure, ask". |
 | Scribe `instructions` | The scribe's role, and the steps for `record`: next decision ID, ask once for a missing reason, the human as decider, repeat the entry back. |
 | Builder `instructions` | The builder's role, and how to read the log with `list_references` and `load_internal_documents`. |
 

@@ -22,7 +22,7 @@ import secrets
 import sys
 import time
 
-from driver import Room, text_from
+from driver import Room, report, text_from
 
 
 def check_hello(room: Room, scribe: str, builder: str) -> bool:
@@ -66,13 +66,6 @@ def check_document_read(room: Room, scribe: str, builder: str) -> list[bool]:
     read = bool(word) and not leaked and re.search(rf"\b{word}\b", builder_said) is not None
     report(f"builder reads the word {word!r} from {document} after !reset (leaked to chat: {leaked})", read, answer + told)
     return [created, read]
-
-
-def report(name: str, ok: bool, replies) -> None:
-    print(f"[{'PASS' if ok else 'FAIL'}] {name}")
-    for r in replies:
-        if r.text.strip():
-            print(f"    {r.author}: {r.text[:300]!r}")
 
 
 def main() -> int:

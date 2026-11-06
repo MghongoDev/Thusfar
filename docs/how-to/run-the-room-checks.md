@@ -27,10 +27,10 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/phase1_check.py --team thusfar
    ```
 
-   Run the Phase 2 checks in a room made fresh from the template, since they expect the seed decisions and nothing after them:
+   Run the Phase 2 checks in a room made fresh from the template, with its own `team` value such as `check1`. They expect the seed decisions and nothing after them, and they add D-005 and D-006, so never run them in your demo room:
 
    ```bash
-   python3 tests/phase2_check.py --team thusfar
+   python3 tests/phase2_check.py --team check1
    ```
 
 Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
@@ -47,9 +47,10 @@ Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits w
 
 | Check | Passes when |
 |---|---|
-| The log holds the seed decisions | The builder quotes D-001 to D-004 from `DECISIONS`, all active, decided by David, and nothing after them. |
+| The room holds one decision log | The builder finds exactly one room document named `DECISIONS`. |
+| The log holds the seed decisions | The builder quotes D-001 to D-004 from `DECISIONS`, all active, worded as in the template's kickoff, decided by David, and nothing after them. |
 | `record` with a reason | The scribe adds D-005 and repeats it back, active, with you as decider and a date. |
-| `record` without a reason | The scribe asks why before it writes. Given the reason, it records D-006. |
+| `record` without a reason | The scribe asks why, and the log still ends at D-005 while it waits. Given the reason, it records D-006. |
 
 The Phase 2 checks add D-005 and D-006 to the log.
 

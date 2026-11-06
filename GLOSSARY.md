@@ -36,6 +36,10 @@ _Avoid_: revoked, deleted, archived, closed
 A human's explicit consent to act against an active decision.
 _Avoid_: confirmation, approval, exception
 
+**Record**:
+To add a new decision to the log, at a human's request: `@<team>-scribe record: <decision>`.
+_Avoid_: log, save, note, capture
+
 **Supersede**:
 To replace an active decision with a new one that names it. The old decision stays in the log.
 _Avoid_: edit, update, overwrite

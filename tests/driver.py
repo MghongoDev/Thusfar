@@ -164,3 +164,11 @@ class Room:
 def text_from(replies: list[Reply], agent: str) -> str:
     """Everything one agent said, joined."""
     return "\n".join(r.text for r in replies if r.author == agent)
+
+
+def report(name: str, ok: bool, replies: list[Reply], width: int = 400) -> None:
+    """Print one check's result, then every non-empty reply it saw."""
+    print(f"[{'PASS' if ok else 'FAIL'}] {name}")
+    for r in replies:
+        if r.text.strip():
+            print(f"    {r.author}: {r.text[:width]!r}")

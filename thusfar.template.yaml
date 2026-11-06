@@ -52,16 +52,14 @@ agents:
       Recording a decision. When a human writes
       "@{team}-scribe record: <decision>":
       1. Read the log and take the next decision ID after the highest one
-         in it. Never reuse an ID, even a superseded one.
+         in it.
       2. If the message gives no reason, ask once: "Why did the team
-         choose this?" Write nothing until the human answers.
-      3. Add the entry, in the format the room instructions give, with
-         state ACTIVE, the human who asked as the decider, today's date
-         in UTC, and "Supersedes: none".
-      4. Reply with the full entry you wrote.
-
-      If a human states a decision without the record command, ask
-      whether to record it. Do not record it on your own.
+         choose this?" Write nothing until the human answers. If the
+         answer still gives no reason, record nothing and say so.
+      3. Add the decision in the room's format, with the human who asked
+         as the decider, under the name the room shows for them, and
+         today's date in UTC.
+      4. Reply with the full decision you wrote.
 
       Keep replies short. When you change the log, repeat back what you
       wrote.
@@ -111,6 +109,12 @@ room:
     it. SUPERSEDED means a newer decision replaced it; its state line then
     reads "D-001 | SUPERSEDED by D-005". A superseded decision stays in the
     log. Decision IDs run in order from D-001 and are never reused.
+    A new decision starts ACTIVE, with "Supersedes: none" unless it
+    replaces one.
+
+    A decision, once written, is never edited. The only change to an old
+    decision is its state line when a newer decision supersedes it. To
+    change anything else, a human supersedes it with a new decision.
 
     An override is a human's explicit consent to act against an active
     decision, such as "override, the team approved". A vague reply such as
