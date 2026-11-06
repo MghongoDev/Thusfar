@@ -1,0 +1,61 @@
+# Thusfar
+
+A Switch room where a team records its decisions, and an agent checks them before it does any work.
+
+## Language
+
+### The log
+
+**Decision**:
+A choice a human made for the team, with its reason, its author, and its date.
+_Avoid_: rule, policy, agreement
+
+**Decision log**:
+The list of every decision the room has made, in ID order.
+_Avoid_: decision register, history, memory
+
+**Decision ID**:
+The label of one decision, such as `D-001`. No two decisions share an ID, and an ID never returns.
+_Avoid_: number, key
+
+**Active**:
+The state of a decision the team still holds.
+_Avoid_: current, live, open
+
+**Superseded**:
+The state of a decision that a newer decision has replaced.
+_Avoid_: revoked, deleted, archived, closed
+
+### Changing the log
+
+**Override**:
+A human's explicit consent to act against an active decision.
+_Avoid_: confirmation, approval, exception
+
+**Supersede**:
+To replace an active decision with a new one that names it. The old decision stays in the log.
+_Avoid_: edit, update, overwrite
+
+**Decider**:
+The human who made a decision or gave the override that produced it. Never an agent.
+_Avoid_: owner, author, approver
+
+### The builder's check
+
+**Conflict**:
+A request that would break an active decision if the builder carried it out.
+_Avoid_: violation, clash
+
+**Challenge**:
+The builder's refusal to act on a conflict. It cites the decision ID, the reason, and the decider, then asks a human for an override.
+_Avoid_: block, rejection, pushback
+
+### The agents
+
+**Scribe**:
+The agent that writes the decision log. It is the only one that can.
+_Avoid_: recorder, logger, secretary
+
+**Builder**:
+The agent that does tasks, after it checks the decision log.
+_Avoid_: worker, executor, coder

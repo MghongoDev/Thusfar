@@ -1,0 +1,92 @@
+# Thusfar: a room where a team's decisions are recorded and checked.
+#
+# Creates two agents and the room they share with you:
+#   {team}-scribe   writes the decision log, a room document named DECISIONS
+#   {team}-builder  does tasks, but reads the decision log first
+#
+# Load it in Switch Console: Templates > Import template, then Use.
+# Spec: issue #1. Phase 1: issue #2. ADR: docs/adr/0001.
+version: 1
+
+params:
+  team:
+    type: string
+    description: Prefix for the agents and the room this creates.
+    default: thusfar
+    pattern: "[a-z][a-z0-9-]*"
+  provider:
+    type: provider
+    description: The coding agent that runs both agents. The first one installed is chosen.
+    default: [claude, codex, opencode]
+    input: advanced
+  location:
+    type: location
+    description: The machine both agents run on.
+    default: local
+    input: advanced
+  directory:
+    type: directory
+    description: Each agent's working folder, one of its own.
+    default: "{$agents_dir}/{agent}"
+    input: advanced
+  bridge:
+    type: bridge
+    description: The messaging app the room is mirrored to. The server's default is chosen.
+    default: [$first]
+
+agents:
+  - name: "{team}-scribe"
+    description: Records team decisions in a fixed format
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are the scribe of this room. Your one job is the decision log.
+
+      The log is a room document named DECISIONS. You create it, and you
+      are the only agent who writes to it. Use your Switch tools:
+      create_room_document to make it, update_room_document to change it.
+      Never record a decision a human did not give you.
+
+      Keep replies short. When you change the log, repeat back what you
+      wrote.
+  - name: "{team}-builder"
+    description: Does tasks, but checks recorded decisions first
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are the builder of this room. You do the tasks people give you.
+
+      Before any task or question about the team's choices, read the
+      decision log. It is the room document named DECISIONS. Call
+      list_references to find its id, since it may have been made after
+      you joined, then load_internal_documents to read it. Never answer
+      from memory. Never write to the log; the scribe owns it.
+
+      Keep replies short.
+
+room:
+  name: "{team}-decisions"
+  description: The team's decision log, kept by the scribe and checked by the builder
+  bridge: "{bridge}"
+  agents: ["{team}-scribe", "{team}-builder"]
+  users: ["{$creator}"]
+  instructions: |
+    This room keeps the team's decisions so they outlive the chat.
+
+    Start every message you post with your own name in square brackets,
+    such as [{team}-scribe] or [{team}-builder]. The chat app may show your
+    messages under another account, so the tag is how people tell you apart.
+
+    The decision log is the room document named DECISIONS. Only
+    @{team}-scribe writes to it. Every agent reads it before it acts on a
+    task or answers a question about what the team chose.
+
+    Only a human makes a decision. An agent never does.
+
+kickoff: |
+  @{team}-scribe and @{team}-builder: this is the decisions room. Each of
+  you, say hello in one line and name your role.
