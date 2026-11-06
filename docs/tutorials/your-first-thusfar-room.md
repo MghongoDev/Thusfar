@@ -34,4 +34,4 @@ If an agent stays silent, mention it by name: `@thusfar-builder hello`.
 
 ## What you have now
 
-A room with two agents that know their roles. The decision log does not exist yet.
+A room with two agents that know their roles. The scribe may create an empty `DECISIONS` log when it says hello. It holds no decisions yet.
