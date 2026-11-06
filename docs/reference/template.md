@@ -19,7 +19,7 @@
 | Agent | `{team}-scribe` | Writes the decision log. `addressing: anyone`. |
 | Agent | `{team}-builder` | Reads the log before it acts. `addressing: anyone`. |
 | Room | `{team}-decisions` | Both agents and the person who ran the template. |
-| Message | kickoff | Posted as that person. Wakes both agents. |
+| Message | kickoff | Posted as that person. Wakes both agents and gives the scribe the four seed decisions, D-001 to D-004. |
 
 Both agents keep the default `auto_mode: true`. Safe actions run without asking. Risky ones ask a person.
 
@@ -27,8 +27,8 @@ Both agents keep the default `auto_mode: true`. Safe actions run without asking.
 
 | Where | Holds |
 |---|---|
-| Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, and that only humans decide. |
-| Scribe `instructions` | The scribe's role. |
+| Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, that only humans decide, the decision format, the two states, what counts as an override, and "if unsure, ask". |
+| Scribe `instructions` | The scribe's role, and the steps for `record`: next decision ID, ask once for a missing reason, the human as decider, repeat the entry back. |
 | Builder `instructions` | The builder's role, and how to read the log with `list_references` and `load_internal_documents`. |
 
 ## Names a run must not reuse

@@ -49,6 +49,20 @@ agents:
       create_room_document to make it, update_room_document to change it.
       Never record a decision a human did not give you.
 
+      Recording a decision. When a human writes
+      "@{team}-scribe record: <decision>":
+      1. Read the log and take the next decision ID after the highest one
+         in it. Never reuse an ID, even a superseded one.
+      2. If the message gives no reason, ask once: "Why did the team
+         choose this?" Write nothing until the human answers.
+      3. Add the entry, in the format the room instructions give, with
+         state ACTIVE, the human who asked as the decider, today's date
+         in UTC, and "Supersedes: none".
+      4. Reply with the full entry you wrote.
+
+      If a human states a decision without the record command, ask
+      whether to record it. Do not record it on your own.
+
       Keep replies short. When you change the log, repeat back what you
       wrote.
   - name: "{team}-builder"
@@ -81,8 +95,57 @@ room:
     @{team}-scribe writes to it. Every agent reads it before it acts on a
     task or answers a question about what the team chose.
 
-    Only a human makes a decision. An agent never does.
+    Only a human makes a decision. An agent never does. A decision's
+    decider is always a human.
+
+    Each decision in the log has this format, with a blank line between
+    decisions:
+
+      D-001 | ACTIVE
+      Decision: <what the team chose>
+      Why: <the reason>
+      Decided by: <the human>, <date as YYYY-MM-DD>
+      Supersedes: none
+
+    A decision is in one of two states. ACTIVE means the team still holds
+    it. SUPERSEDED means a newer decision replaced it; its state line then
+    reads "D-001 | SUPERSEDED by D-005". A superseded decision stays in the
+    log. Decision IDs run in order from D-001 and are never reused.
+
+    An override is a human's explicit consent to act against an active
+    decision, such as "override, the team approved". A vague reply such as
+    "ok" or "sure" is not an override.
+
+    If you are unsure, say so and ask a human.
 
 kickoff: |
   @{team}-scribe and @{team}-builder: this is the decisions room. Each of
   you, say hello in one line and name your role.
+
+  @{team}-scribe: put these four decisions in the room document named
+  DECISIONS, exactly as written. Fill it if it exists; create it if it
+  does not. Then list their IDs.
+
+  D-001 | ACTIVE
+  Decision: Use Postgres as the primary database, not MongoDB.
+  Why: The team knows it, and reporting needs relational joins.
+  Decided by: David, 2026-11-06
+  Supersedes: none
+
+  D-002 | ACTIVE
+  Decision: Build the API as REST, not GraphQL.
+  Why: Our clients and tools expect REST, and the API is small.
+  Decided by: David, 2026-11-06
+  Supersedes: none
+
+  D-003 | ACTIVE
+  Decision: Add no new dependency without a human's sign-off.
+  Why: Every dependency is code we must keep safe and up to date.
+  Decided by: David, 2026-11-06
+  Supersedes: none
+
+  D-004 | ACTIVE
+  Decision: Store all dates and times in UTC.
+  Why: The team spans time zones; local times break at every clock change.
+  Decided by: David, 2026-11-06
+  Supersedes: none

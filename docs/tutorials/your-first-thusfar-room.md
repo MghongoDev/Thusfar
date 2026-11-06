@@ -25,13 +25,23 @@ Select **Create all**. Console creates `thusfar-scribe` and `thusfar-builder`, t
 
 ## 3. Meet the agents
 
-Open Mattermost from Console and go to the `thusfar-decisions` channel. The kickoff asks each agent to say hello. Within a minute or two you should see:
+Open Mattermost from Console and go to the `thusfar-decisions` channel. The kickoff asks each agent to say hello, and gives the scribe the four seed decisions. Within a few minutes you should see:
 
 - `thusfar-scribe` say it keeps the decision log.
 - `thusfar-builder` say it does tasks after it checks the log.
+- `thusfar-scribe` list the IDs D-001 to D-004, once the decisions are in the log.
 
 If an agent stays silent, mention it by name: `@thusfar-builder hello`.
 
 ## What you have now
 
-A room with two agents that know their roles. The scribe may create an empty `DECISIONS` log when it says hello. It holds no decisions yet.
+A room with two agents that know their roles, and a decision log that holds four seed decisions:
+
+| ID | Decision |
+|---|---|
+| D-001 | Use Postgres as the primary database, not MongoDB. |
+| D-002 | Build the API as REST, not GraphQL. |
+| D-003 | Add no new dependency without a human's sign-off. |
+| D-004 | Store all dates and times in UTC. |
+
+To add one, write `@thusfar-scribe record: <decision>. Why: <reason>`. The scribe gives it the next decision ID and repeats it back.

@@ -18,6 +18,10 @@ _Avoid_: decision register, history, memory
 The label of one decision, such as `D-001`. No two decisions share an ID, and an ID never returns.
 _Avoid_: number, key
 
+**Seed decision**:
+One of the four decisions, D-001 to D-004, that the kickoff puts in a new room's decision log.
+_Avoid_: default, sample, preset
+
 **Active**:
 The state of a decision the team still holds.
 _Avoid_: current, live, open

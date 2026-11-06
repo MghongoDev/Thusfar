@@ -27,7 +27,13 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/phase1_check.py --team thusfar
    ```
 
-Each check prints `PASS` or `FAIL`, then every reply it saw. The script exits with 0 only when all checks pass.
+   Run the Phase 2 checks in a room made fresh from the template, since they expect the seed decisions and nothing after them:
+
+   ```bash
+   python3 tests/phase2_check.py --team thusfar
+   ```
+
+Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
 
 ## What the Phase 1 checks do
 
@@ -37,7 +43,17 @@ Each check prints `PASS` or `FAIL`, then every reply it saw. The script exits wi
 | The scribe creates the room document | The scribe names a new room document, such as `CHECK-3F9A1C`, in its reply. Each run picks a new name, so the scribe must create the document, not update one. |
 | The builder reads the room document after `!reset` | With its context cleared, the builder names the secret word the scribe wrote in the document. The word never appears in the chat, so the builder can only have read it from the document. |
 
-Each run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
+## What the Phase 2 checks do
+
+| Check | Passes when |
+|---|---|
+| The log holds the seed decisions | The builder quotes D-001 to D-004 from `DECISIONS`, all active, decided by David, and nothing after them. |
+| `record` with a reason | The scribe adds D-005 and repeats it back, active, with you as decider and a date. |
+| `record` without a reason | The scribe asks why before it writes. Given the reason, it records D-006. |
+
+The Phase 2 checks add D-005 and D-006 to the log.
+
+Each Phase 1 run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
 
 ## If something goes wrong
 
