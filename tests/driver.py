@@ -1,6 +1,6 @@
 """Drive a Thusfar room through Mattermost, as a human would.
 
-The one test seam for Thusfar is the room itself (spec #1, Testing Decisions).
+Thusfar is tested only through the room itself (spec #1, Testing Decisions).
 This module logs in as the human, posts to the room, and collects what the
 agents reply. It uses only the Python standard library.
 
@@ -8,13 +8,12 @@ Settings come from `.env.local` at the repo root, which git ignores:
 MM_URL, and either MM_TOKEN (a personal access token) or MM_USER and
 MM_PASSWORD.
 
-Issue: #2 (Phase 1). Reused by #5 (Phase 4). ADR: 0001.
+Issues: #7 (Phase 1 close-out, part of #2). Reused by #5 (Phase 4). ADR: 0001.
 """
 
 from __future__ import annotations
 
 import json
-import re
 import os
 import pathlib
 import time
@@ -24,9 +23,6 @@ from dataclasses import dataclass
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 
-# Switch can post an agent's reply through the server's admin account, so the
-# Mattermost author is not enough. Each agent tags its messages "[name] ...".
-TAG = re.compile(r"^\s*\*{0,2}\[([a-z0-9][a-z0-9._-]*)\]")
 
 
 def load_settings(path: pathlib.Path = REPO / ".env.local") -> dict[str, str]:
@@ -109,13 +105,10 @@ class Room:
         raise SystemExit(f"No channel named {room_name!r} that {self.me['username']} can see.")
 
     def _author(self, post: dict) -> str:
-        """Who wrote a post: its [tag] if it has one, else its Mattermost user."""
-        tag = TAG.match(post.get("message", ""))
-        if tag:
-            return tag.group(1)
-        override = (post.get("props") or {}).get("override_username")
-        if override:
-            return override
+        """Who wrote a post: the name it is shown under, else its Mattermost user."""
+        shown_as = (post.get("props") or {}).get("override_username")
+        if shown_as:
+            return shown_as
         uid = post["user_id"]
         if uid not in self._names:
             self._names[uid] = self._get(f"/users/{uid}")["username"]
@@ -161,7 +154,7 @@ class Room:
             fresh = self.replies_since(since)
             if len(fresh) > len(replies):
                 replies, last_new = fresh, time.monotonic()
-            heard = all(any(a in r.author for r in replies) for a in agents)
+            heard = all(any(r.author == a for r in replies) for a in agents)
             if heard and time.monotonic() - last_new >= quiet:
                 break
             time.sleep(poll)
@@ -170,4 +163,4 @@ class Room:
 
 def text_from(replies: list[Reply], agent: str) -> str:
     """Everything one agent said, joined."""
-    return "\n".join(r.text for r in replies if agent in r.author)
+    return "\n".join(r.text for r in replies if r.author == agent)

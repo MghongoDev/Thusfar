@@ -34,10 +34,10 @@ Each check prints `PASS` or `FAIL`, then every reply it saw. The script exits wi
 | Check | Passes when |
 |---|---|
 | Both agents reply | Each agent answers a hello under its own name. |
-| The scribe creates the document | The scribe names `DECISIONS` in its reply. |
-| The builder quotes the decision after `!reset` | With its context cleared, the builder answers "Postgres" and quotes `D-000`. |
+| The scribe creates the room document | The scribe names a new room document, such as `CHECK-3F9A1C`, in its reply. Each run picks a new name, so the scribe must create the document, not update one. |
+| The builder reads the room document after `!reset` | With its context cleared, the builder names the secret word the scribe wrote in the document. The word never appears in the chat, so the builder can only have read it from the document. |
 
-The second and third checks write a test `DECISIONS` document into the room. Run them in a room you will throw away, not in your demo room.
+Each run leaves a `CHECK-...` room document and a few test messages behind. Run the checks in a room you will throw away, not in your demo room.
 
 ## If something goes wrong
 

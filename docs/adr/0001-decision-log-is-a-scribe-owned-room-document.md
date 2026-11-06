@@ -8,6 +8,8 @@ Switch lets only the agent that created a document change it. That fixes the scr
 
 We do not seed the log through the template's `room.docs` list. A document made that way has no agent creator, so no agent could update it later. The kickoff message asks the scribe to create the document instead.
 
+Phase 1 builds the room before the log exists, so its kickoff only wakes the agents. From Phase 2 ([#9](https://github.com/MghongoDev/Thusfar/issues/9)), the kickoff also asks the scribe to create the log with the seed decisions.
+
 ## Considered options
 
 - **Room document owned by the scribe** (chosen).

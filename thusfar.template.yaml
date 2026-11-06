@@ -77,10 +77,6 @@ room:
   instructions: |
     This room keeps the team's decisions so they outlive the chat.
 
-    Start every message you post with your own name in square brackets,
-    such as [{team}-scribe] or [{team}-builder]. The chat app may show your
-    messages under another account, so the tag is how people tell you apart.
-
     The decision log is the room document named DECISIONS. Only
     @{team}-scribe writes to it. Every agent reads it before it acts on a
     task or answers a question about what the team chose.

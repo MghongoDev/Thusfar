@@ -2,7 +2,7 @@
 
 Teams make decisions in chat, and the chat scrolls them away. Agents in the same chat know nothing of those decisions, so they do whatever the latest message asks.
 
-Thusfar is a [Switch](https://switchagents.ai) room with two agents. The **scribe** writes each decision to a decision log. The **builder** does tasks, but reads the log first, and challenges any request that breaks an active decision. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
+Thusfar is a [Switch](https://switchagents.ai) room with two agents. When the build is done, the **scribe** will write each decision to a decision log, and the **builder** will do tasks, but read the log first and challenge any request that breaks an active decision. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
 
 > **Status: Phase 1 of 5 done.** One template creates both agents and the room, and the room checks pass. The scribe and builder roles are still bare. See [Status](#status).
 
@@ -29,8 +29,8 @@ You (a human, in Mattermost)
 ```
 
 - The room holds the log. It is a room document named `DECISIONS`.
-- Only the scribe writes to it. Switch lets only the agent that made a document change it ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)).
-- The builder reads the log before every task.
+- Only the scribe writes to it. Switch lets only the agent that made a document change it ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)). Recording decisions arrives in Phase 2.
+- The builder reads the log before every task. Its checks and challenges arrive in Phase 3.
 
 [How Thusfar works](docs/explanation/how-thusfar-works.md) explains the design.
 

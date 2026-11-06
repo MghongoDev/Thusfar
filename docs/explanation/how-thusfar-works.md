@@ -4,7 +4,7 @@ Thusfar has no code of its own that runs. A Switch template creates two agents a
 
 ## The room holds the log
 
-Each agent has its own working folder, and neither can see the other's. A file would therefore not work as a shared log. A Switch room document does: every agent in the room can read it, even right after `!reset` clears its context.
+Each agent has its own working folder, and neither can see the other's. So a file would not work as a shared log. A Switch room document does: every agent in the room can read it, even right after `!reset` clears its context.
 
 The log is a room document named `DECISIONS`. See [ADR 0001](../adr/0001-decision-log-is-a-scribe-owned-room-document.md).
 

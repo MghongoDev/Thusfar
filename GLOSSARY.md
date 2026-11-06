@@ -7,7 +7,7 @@ A Switch room where a team records its decisions, and an agent checks them befor
 ### The log
 
 **Decision**:
-A choice a human made for the team, with its reason, its author, and its date.
+A choice a human made for the team, with its reason, its decider, and its date.
 _Avoid_: rule, policy, agreement
 
 **Decision log**:
@@ -49,6 +49,20 @@ _Avoid_: violation, clash
 **Challenge**:
 The builder's refusal to act on a conflict. It cites the decision ID, the reason, and the decider, then asks a human for an override.
 _Avoid_: block, rejection, pushback
+
+### The room
+
+**Room document**:
+A document that belongs to a Switch room, not to one agent's folder. Every agent in the room can read it. Only the agent that created it can change it.
+_Avoid_: file, shared doc, note
+
+**Kickoff**:
+The first message a template run posts to the room, in the name of the human who ran it.
+_Avoid_: welcome message, intro
+
+**Room check**:
+A test that posts to the room as a human would and checks only what a human would see in the replies.
+_Avoid_: unit test, integration test, e2e
 
 ### The agents
 

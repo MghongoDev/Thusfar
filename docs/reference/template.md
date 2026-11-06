@@ -27,7 +27,7 @@ Both agents keep the default `auto_mode: true`. Safe actions run without asking.
 
 | Where | Holds |
 |---|---|
-| Room `instructions` | Rules every agent in the room follows: start each message with its name in square brackets, where the log is, who writes it, and that only humans decide. |
+| Room `instructions` | Rules every agent in the room follows: where the log is, who writes it, and that only humans decide. |
 | Scribe `instructions` | The scribe's role. |
 | Builder `instructions` | The builder's role, and how to read the log with `list_references` and `load_internal_documents`. |
 
