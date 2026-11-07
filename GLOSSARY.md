@@ -62,12 +62,16 @@ _Avoid_: owner, author, approver
 A request that would break an active decision if the builder carried it out.
 _Avoid_: violation, clash
 
+**Sign-off decision**:
+A decision that does not forbid something, but asks for a human's sign-off first, such as D-003 on new dependencies. A challenge cites it, and an override meets it without superseding it ([ADR 0002](docs/adr/0002-an-override-answers-the-whole-challenge.md)).
+_Avoid_: soft rule, gate, approval rule
+
 **Relevant decisions line**:
 The builder's first message on a task, naming the decisions that bear on it, such as `Relevant decisions: D-001, D-004`, or `Relevant decisions: none relevant`.
 _Avoid_: preamble, check summary
 
 **Challenge**:
-The builder's refusal to act on a conflict. It cites the decision ID, the reason, and the decider, then asks a human for an override.
+The builder's refusal to act on a conflict. It cites each decision the request conflicts with: its decision ID, its reason, and its decider. Then it asks a human for an override.
 _Avoid_: block, rejection, pushback
 
 ### The room

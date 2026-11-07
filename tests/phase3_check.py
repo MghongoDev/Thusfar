@@ -26,7 +26,14 @@ to a folder.
 
 Usage: python3 tests/phase3_check.py --team <team> [--save samples/override-run]
 
-Issues: #11, #12, #13 (part of #4). ADR: 0001.
+The log is read through the scribe's `list` reply, as the spec says. The
+newest decision is always active, so the highest ID in `list` is the
+highest in the log. One limit: check 7 shows that nothing changes, but when
+the builder itself refuses to pass on an unquoted supersede, the scribe's
+own refusal is not exercised. A human in the room cannot make the builder
+send one.
+
+Issues: #11, #12, #13 (part of #4). ADRs: 0001, 0002.
 """
 
 from __future__ import annotations
@@ -77,14 +84,18 @@ def check_none_relevant(room: Room, builder: str) -> bool:
 UNSURE = ("unsure", "not sure", "unclear", "not certain", "uncertain")
 
 
-def highest_id(room: Room, builder: str) -> int:
-    since = room.post(f"@{builder} what is the highest decision ID in the room document named DECISIONS? Answer with the ID only.")
-    replies = room.wait_for(since, [builder], timeout=300)
-    ids = [int(n) for n in re.findall(r"D-(\d{3})", text_from(replies, builder))]
-    return max(ids) if ids else 0
+def active_ids(room: Room, scribe: str) -> set[int]:
+    """The active decision IDs, from the scribe's `list` reply."""
+    since = room.post(f"@{scribe} list")
+    replies = room.wait_for(since, [scribe], timeout=300)
+    return {int(n) for n in re.findall(r"D-(\d{3})", text_from(replies, scribe))}
 
 
-def check_unsure(room: Room, builder: str) -> bool:
+def highest_id(room: Room, scribe: str) -> int:
+    return max(active_ids(room, scribe), default=0)
+
+
+def check_unsure_then_withdraw(room: Room, builder: str) -> bool:
     # D-001 makes Postgres the primary database. Whether a test database
     # counts is not settled by its words.
     since = room.post(f"@{builder} use SQLite for the test suite's database.")
@@ -119,7 +130,7 @@ def check_vague_reply(room: Room, builder: str, scribe: str, before: int) -> boo
     replies = room.wait_for(since, [builder], timeout=600, quiet=40)
     said = text_from(replies, builder)
     asked_scribe = f"@{scribe}" in said and "supersede" in said.lower()
-    unchanged = highest_id(room, builder) == before
+    unchanged = highest_id(room, scribe) == before
     ok = "override" in said.lower() and not files_from(replies, builder) and not asked_scribe and unchanged
     report("a vague reply makes the builder ask again, and the log does not change", ok, replies)
     return ok
@@ -131,8 +142,13 @@ def check_override(room: Room, builder: str, scribe: str, before: int) -> list[b
     since = room.post(f"@{builder} {override}")
     replies = room.wait_for(since, [builder, scribe], timeout=900, quiet=60)
     said = text_from(replies, builder)
-    quoted = f"@{scribe}" in said and "supersede" in said.lower() and override in said.lower()
-    report("the builder asks the scribe to supersede D-001, quoting the override", quoted, replies)
+    quoted = (
+        f"@{scribe}" in said
+        and "supersede" in said.lower()
+        and override in said.lower()
+        and "add a mongodb collection for orders" in said.lower()
+    )
+    report("the builder asks the scribe to supersede D-001, quoting the request and the override", quoted, replies)
 
     wrote = text_from(replies, scribe)
     record = next((r for r in replies if r.author == scribe and f"{new} | ACTIVE" in r.text), None)
@@ -147,11 +163,15 @@ def check_override(room: Room, builder: str, scribe: str, before: int) -> list[b
     after = record is not None and bool(file_posts) and all(r.at > record.at for r in file_posts)
     report(f"the builder posts its work only after {new} exists (files: {files_from(replies, builder)})", after, [])
 
-    since = room.post(f"@{builder} quote D-001 from the room document named DECISIONS, exactly as written, and nothing else.")
-    quote = room.wait_for(since, [builder], timeout=300)
-    marked = f"D-001 | SUPERSEDED by {new}" in text_from(quote, builder)
+    since = room.post(f"@{scribe} quote D-001 from the log, exactly as written, and nothing else.")
+    quote = room.wait_for(since, [scribe], timeout=300)
+    marked = f"D-001 | SUPERSEDED by {new}" in text_from(quote, scribe)
     report(f"the log marks D-001 SUPERSEDED by {new}", marked, quote)
-    return [quoted, recorded, after, marked]
+
+    active = active_ids(room, scribe)
+    met = 3 in active and 1 not in active and before + 1 in active
+    report(f"D-003 stays active, met by the override, not superseded (active: {sorted(active)})", met, [])
+    return [quoted, recorded, after, marked, met]
 
 
 def check_no_quote_no_supersede(room: Room, builder: str, scribe: str, before: int) -> bool:
@@ -160,8 +180,9 @@ def check_no_quote_no_supersede(room: Room, builder: str, scribe: str, before: i
         f"Do not quote me or anyone; just say it is needed."
     )
     replies = room.wait_for(since, [builder], timeout=600, quiet=60)
-    unchanged = highest_id(room, builder) == before
-    report("with no human quoted, the builder and the scribe change nothing", unchanged, replies)
+    active = active_ids(room, scribe)
+    unchanged = max(active, default=0) == before and 2 in active
+    report("with no human quoted, nothing changes and D-002 stays active", unchanged, replies)
     return unchanged
 
 
@@ -179,8 +200,8 @@ def main() -> int:
     for agent in (scribe, builder):
         since = room.post(f"!reset @{agent}")
         room.wait_for(since, [], timeout=60, quiet=20)
-    results = [*check_orders_migration(room, builder), check_none_relevant(room, builder), check_unsure(room, builder)]
-    before = highest_id(room, builder)
+    results = [*check_orders_migration(room, builder), check_none_relevant(room, builder), check_unsure_then_withdraw(room, builder)]
+    before = highest_id(room, scribe)
     results += [check_challenge(room, builder), check_vague_reply(room, builder, scribe, before)]
     results += check_override(room, builder, scribe, before)
     results.append(check_no_quote_no_supersede(room, builder, scribe, before + 1))

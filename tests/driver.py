@@ -8,7 +8,7 @@ Settings come from `.env.local` at the repo root, which git ignores:
 MM_URL, and either MM_TOKEN (a personal access token) or MM_USER and
 MM_PASSWORD.
 
-Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files. Reused by #5 (Phase 4). ADR: 0001.
+Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added saving a run. ADRs: 0001, 0002. Reused by #5 (Phase 4).
 """
 
 from __future__ import annotations
