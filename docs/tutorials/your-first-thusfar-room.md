@@ -5,7 +5,7 @@ In this tutorial you create a Thusfar room from the template and meet its two ag
 ## What you need
 
 - Switch Console with its local server running, and Docker. On macOS or Windows, use the install links in the [README quick start](../../README.md#quick-start). On Linux, follow [Install Switch Console on Linux](../how-to/install-switch-console-on-linux.md).
-- Claude Code, signed in, and shown as signed in under **Settings**, **Agent providers**.
+- A coding agent (Claude Code, Codex, or OpenCode), signed in, and shown as signed in under **Settings**, **Agent providers**.
 - A clone of this repo.
 
 ## 1. Import the template
@@ -25,7 +25,7 @@ Select **Create all**. Console creates `thusfar-scribe` and `thusfar-builder`, t
 
 ## 3. Meet the agents
 
-Open Mattermost from Console and go to the `thusfar-decisions` channel. The kickoff asks each agent to say hello, and gives the scribe the four seed decisions. Within a few minutes you should see:
+Open Mattermost from Console (**Home**, then **Messaging apps**; the sign-in is under **Sign-in details…** on the same row) and go to the `thusfar-decisions` channel. The kickoff asks each agent to say hello, and gives the scribe the four seed decisions. Within a few minutes you should see:
 
 - `thusfar-scribe` say it keeps the decision log.
 - `thusfar-builder` say it does tasks after it checks the log.

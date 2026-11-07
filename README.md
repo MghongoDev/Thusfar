@@ -10,37 +10,54 @@ Thusfar is a [Switch](https://switchagents.ai) room with two agents. The **scrib
 
 ## Quick start
 
-You need three things:
+Thusfar has been tested on Fedora Linux only. It uses no platform-specific feature, so it should work the same way on macOS and Windows, but nobody has run these steps there yet.
 
-- **Switch Console**, with its local server running.
-- **Docker**: Docker Desktop on macOS and Windows, or Docker Engine on Linux.
-- **Claude Code**, signed in.
+### Install the tools
 
-Install Switch Console for your platform:
+1. **Install Git**, from [git-scm.com/downloads](https://git-scm.com/downloads). On macOS you can run `xcode-select --install` instead. Most Linux systems have it already.
 
-| Platform | Install |
-|---|---|
-| macOS | [Apple silicon](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-arm64.dmg) or [Intel](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.dmg). Open the `.dmg` and drag Switch Console to Applications. |
-| Windows | [Installer](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.exe), or the `.msi` from the [latest release](https://github.com/sandbox-quantum/switch/releases/latest). |
-| Linux | Follow [Install Switch Console on Linux](docs/how-to/install-switch-console-on-linux.md). It needs launch flags that the other platforms do not. |
+2. **Install Docker** and start it.
 
-Install Claude Code, then run `claude` once to sign in:
+   | Platform | Install |
+   |---|---|
+   | macOS | [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/). Pick Apple silicon or Intel to match your Mac. |
+   | Windows | [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/). It runs on WSL 2. If the installer reports that WSL is missing, run `wsl --install` in PowerShell as administrator, restart, then run the installer again. See [Install WSL](https://learn.microsoft.com/windows/wsl/install). |
+   | Linux | [Docker Engine](https://docs.docker.com/engine/install/) with the Compose plugin. The [Linux how-to](docs/how-to/install-switch-console-on-linux.md) covers the `docker` group. |
 
-| Platform | Command |
-|---|---|
-| macOS or Linux | `curl -fsSL https://claude.ai/install.sh \| bash` |
-| Windows (PowerShell) | `irm https://claude.ai/install.ps1 \| iex` |
+3. **Install a coding agent and sign in.** The template runs both agents on the first one it finds: Claude Code, Codex, or OpenCode. For Claude Code, run the command for your platform, then run `claude` once to sign in:
 
-Start Docker before you open Console. In Console, select **Get started**, then **On this computer**, then **Start**, and wait for "Local server is running".
+   | Platform | Command |
+   |---|---|
+   | macOS or Linux | `curl -fsSL https://claude.ai/install.sh \| bash` |
+   | Windows (PowerShell) | `irm https://claude.ai/install.ps1 \| iex` |
 
-Thusfar has been tested on Fedora Linux only. The template uses no platform-specific feature, so it should work the same way on macOS and Windows. The room checks in `tests/` need Python 3; on Windows, run them with `py` in place of `python3`.
+4. **Install Switch Console.**
 
-1. Clone this repo.
-2. In Switch Console, open **Templates**, select **Import template**, and choose [`thusfar.template.yaml`](thusfar.template.yaml).
-3. Select **Use**, keep the defaults, and select **Create all**.
-4. Open the `thusfar-decisions` channel in Mattermost. Both agents say hello.
+   | Platform | Install |
+   |---|---|
+   | macOS | [Apple silicon](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-arm64.dmg) or [Intel](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.dmg). Open the `.dmg` and drag Switch Console to Applications. |
+   | Windows | [Installer](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.exe), or the `.msi` from the [latest release](https://github.com/sandbox-quantum/switch/releases/latest). |
+   | Linux | Follow [Install Switch Console on Linux](docs/how-to/install-switch-console-on-linux.md). It needs launch flags that the other platforms do not. |
 
-The [first-room tutorial](docs/tutorials/your-first-thusfar-room.md) walks through these steps and checks each one.
+5. **Start the local server.** With Docker running, open Console and select **Get started**, then **On this computer**, then **Start**. Wait for "Local server is running".
+
+6. **Check that Console can see your coding agent.** Open **Settings**, then **Agent providers**, and select **Recheck**. Your agent should show as signed in. If it does not, sign in again from a terminal, then select **Recheck** again.
+
+### Create the room
+
+7. **Clone this repo:**
+
+   ```bash
+   git clone https://github.com/MghongoDev/Thusfar.git
+   ```
+
+8. **Import the template.** In Console, open **Templates**, select **Import template**, and choose `thusfar.template.yaml` from the clone.
+
+9. **Create the room.** Select **Use** on the template, keep the defaults, and select **Create all**.
+
+10. **Open the room in Mattermost.** In Console, open **Home**. Under **Messaging apps**, open Mattermost, and if it asks you to sign in, use the details under **Sign-in details…** on the same row. Go to the `thusfar-decisions` channel. Within a few minutes both agents say hello, and the scribe lists D-001 to D-004.
+
+The [first-room tutorial](docs/tutorials/your-first-thusfar-room.md) walks through steps 8 to 10 and checks each one. To run the room checks in `tests/`, you also need Python 3.10 or later; on Windows, run them with `py` in place of `python3`.
 
 ## The decision format
 
@@ -135,7 +152,7 @@ The build follows the spec in [issue #1](https://github.com/MghongoDev/Thusfar/i
 
 ## Cost
 
-Thusfar adds no services. It needs Switch Console, its bundled Mattermost, and a Claude Code plan for the agents.
+Thusfar adds no services. It needs Switch Console, its bundled Mattermost, and a plan for the coding agent that runs them, such as Claude Code.
 
 ## Troubleshooting
 
@@ -145,6 +162,9 @@ Thusfar adds no services. It needs Switch Console, its bundled Mattermost, and a
 | Console says Docker is not installed | Install the Docker Compose plugin, and add yourself to the `docker` group. |
 | The run fails with `name_taken` | Agents with these names exist. Pick another `team` value, or delete the old agents. |
 | An agent never answers | Mention it by name. Agents only wake when a message addresses them. |
+| Creating the room fails, or the agents never start | Console cannot see your coding agent. Open **Settings**, then **Agent providers**, and select **Recheck**. |
+| Mattermost asks for a password you never set | Console made the account. Find it in Console under **Home**, **Messaging apps**, **Sign-in details…**. |
+| Docker Desktop on Windows will not start | WSL 2 is missing or out of date. Run `wsl --install` or `wsl --update` in PowerShell as administrator, then restart. |
 
 ## Issues and contributing
 

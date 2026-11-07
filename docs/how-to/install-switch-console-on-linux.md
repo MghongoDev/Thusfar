@@ -6,7 +6,7 @@ This guide installs Switch Console on Fedora, x86_64, and starts its local serve
 
 - Docker, with the Docker Compose plugin. Check with `docker compose version`.
 - Your user in the `docker` group. Check with `id -nG`. If it is missing, run `sudo usermod -aG docker $USER`, then log out and back in.
-- Claude Code, signed in. Check with `claude auth status`.
+- A coding agent, signed in: Claude Code, Codex, or OpenCode. For Claude Code, check with `claude auth status`.
 
 Podman does not work in place of Docker. Console calls the `docker` binary.
 
@@ -36,7 +36,7 @@ Podman does not work in place of Docker. Console calls the `docker` binary.
 
 4. Select **Get started**, then **On this computer**, then **Start**. Wait for "Local server is running".
 
-5. Open **Settings**, then **Agent providers**, and select **Recheck**. Claude Code should show as signed in.
+5. Open **Settings**, then **Agent providers**, and select **Recheck**. Your coding agent should show as signed in.
 
 ## If something goes wrong
 
