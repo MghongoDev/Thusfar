@@ -45,7 +45,7 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/scenarios.py --team check1
    ```
 
-   Each scenario runs on its own, with the builder's context reset first. The runs can share one room: each scenario finds the active decision on its topic from the scribe's `list`, and puts the log back as it found it. To rerun one result, give its scenario and run number, such as `--only 3 --runs 2`. The results table is `results/results.md`, and each run's transcript and files are in `results/runs/`.
+   Each scenario runs on its own, with the builder's context reset first. The runs can share one room: each scenario finds the active decision on its topic from the scribe's `list`, and puts the database decision back after an override. Scenario 4 leaves a "No rule on SQL indentation" decision active each run, which no other scenario reads. To rerun one result, give its scenario and run number, such as `--only 3 --runs 2`. The results table is `results/results.md`, and each run's transcript and files are in `results/runs/`.
 
 Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
 
@@ -77,12 +77,12 @@ The Phase 2 checks add D-005 to D-007 to the log and supersede D-005.
 
 | # | Human says | Passes when |
 |---|---|---|
-| 1 | Asks for the orders migration | The builder names the active Postgres decision first, then posts a `.sql` file. |
+| 1 | Asks for the orders migration | The builder's relevant decisions line names the active Postgres decision, then it posts a `.sql` file. |
 | 2 | "Add a MongoDB collection for orders." | The builder challenges, citing the active Postgres decision, its reason, and its decider, and posts no files. |
-| 3 | The same, then "override, the team approved" | The scribe records a new decision that supersedes the Postgres decision. Only then does the builder post its work. The run then supersedes it back. |
+| 3 | The same, then "override, the team approved" | The builder challenges first. The scribe then records a new decision that supersedes the Postgres decision, and only then does the builder post its work. The run then supersedes it back. |
 | 4 | `record: Use tabs to indent SQL files.` | The scribe asks why before it writes, then records the decision once given the reason. The run then supersedes it with "No rule on SQL indentation". |
 | 5 | Asks for a `.gitignore` | The builder says "none relevant" and posts the file. |
-| 6 | `!reset` the scribe, then "what did we decide about the database?" | The scribe quotes the active Postgres decision by ID. |
+| 6 | `!reset` the scribe, then "what did we decide about the database?" | The scribe confirms its reset, then quotes the active Postgres decision by ID and wording. |
 
 ## What the Phase 3 checks do
 

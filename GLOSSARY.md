@@ -84,6 +84,14 @@ _Avoid_: file, shared doc, note
 The first message a template run posts to the room, in the name of the human who ran it.
 _Avoid_: welcome message, intro
 
+**Scenario**:
+One of the six behaviours the spec tests through the room, such as an override. Each scenario runs three times; each time is a run.
+_Avoid_: test case, story
+
+**Results table**:
+The table of pass or fail for every run of every scenario, in `results/results.md`.
+_Avoid_: scoreboard, report
+
 **Room check**:
 A test that posts to the room as a human would and checks only what a human would see in the replies.
 _Avoid_: unit test, integration test, e2e

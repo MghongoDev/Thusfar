@@ -8,14 +8,14 @@ Settings come from `.env.local` at the repo root, which git ignores:
 MM_URL, and either MM_TOKEN (a personal access token) or MM_USER and
 MM_PASSWORD.
 
-Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added saving a run. ADRs: 0001, 0002. Reused by #5 (Phase 4).
+Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added saving a run; #14 added scribe_list and waits for real messages. ADRs: 0001, 0002. Reused by #5 (Phase 4).
 """
 
 from __future__ import annotations
 
 import json
-import re
 import os
+import re
 import pathlib
 import time
 import urllib.error
@@ -230,11 +230,12 @@ def scribe_list(room: Room, scribe: str) -> dict[int, str]:
     replies = room.wait_for(since, [scribe], timeout=300)
     found: dict[int, str] = {}
     for line in text_from(replies, scribe).splitlines():
-        m = re.search(r"D-(\d{3})", line)
+        m = re.match(r"\W*D-(\d{3})", line)  # only lines that start with an ID
         if m:
             found.setdefault(int(m.group(1)), line)
     return found
 
 
 def decision_id(number: int) -> str:
+    """The decision ID for a number: 5 is D-005."""
     return f"D-{number:03d}"

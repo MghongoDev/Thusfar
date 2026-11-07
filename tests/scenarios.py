@@ -13,7 +13,8 @@ Checks find the active decision on a topic from the scribe's `list` reply,
 never from a fixed decision ID. Each scenario first makes sure a Postgres
 decision is active, superseding the MongoDB decision back if an earlier
 override left one. Scenario 4 supersedes the decision it records with
-"No rule on SQL indentation". So scenarios repeat in one room.
+"No rule on SQL indentation", which stays active. So scenarios repeat in one
+room.
 
 Each run saves its transcript and posted files under results/runs/, and
 the results table, results/results.md, is rebuilt from results.json after
@@ -23,7 +24,7 @@ Usage:
     python3 tests/scenarios.py --team p9                 # all six, runs 1 to 3
     python3 tests/scenarios.py --team p9 --only 3 --runs 2
 
-Issues: #14 (part of #5). ADRs: 0001, 0002.
+Issues: #14 (part of #5), #15. ADRs: 0001, 0002.
 """
 
 from __future__ import annotations
@@ -68,31 +69,40 @@ class Team:
         since = self.room.post(f"@{agent} {text}")
         return self.room.wait_for(since, wait if wait is not None else [agent], timeout=timeout, quiet=quiet)
 
-    def reset(self, agent: str) -> None:
+    def reset(self, agent: str) -> bool:
+        """Reset an agent and wait until it says it has reconnected."""
         since = self.room.post(f"!reset @{agent}")
-        self.room.wait_for(since, [], timeout=60, quiet=20)
+        replies = self.room.wait_for(since, [agent], timeout=120, quiet=15)
+        return "reset" in text_from(replies, agent).lower()
+
+    def active(self) -> dict[int, str]:
+        return scribe_list(self.room, self.scribe)
 
 
-def topic(active: dict[int, str], word: str, unless: str | None = None) -> int | None:
-    """The active decision whose line names `word`, and not `unless`."""
-    for number, line in sorted(active.items()):
-        low = line.lower()
-        if word in low and (unless is None or unless not in low):
-            return number
-    return None
+PG_MARK = "postgres as the primary database"
+
+
+def postgres_decision(active: dict[int, str]) -> int | None:
+    """The active decision that makes Postgres the primary database."""
+    return next((n for n, line in sorted(active.items()) if PG_MARK in line.lower()), None)
+
+
+def mongo_decision(active: dict[int, str]) -> int | None:
+    """The active decision an override made about MongoDB."""
+    return next((n for n, line in sorted(active.items()) if "mongodb" in line.lower() and PG_MARK not in line.lower()), None)
 
 
 def ensure_postgres(t: Team) -> int:
     """The ID of the active Postgres decision, restoring one if an override replaced it."""
-    active = scribe_list(t.room, t.scribe)
-    found = topic(active, "postgres")
+    active = t.active()
+    found = postgres_decision(active)
     if found is not None:
         return found
-    mongo = topic(active, "mongodb")
+    mongo = mongo_decision(active)
     if mongo is None:
         raise SystemExit("The log has no active decision on the database. Use a room made from the template.")
     t.ask(t.scribe, f"supersede {decision_id(mongo)} with: {POSTGRES} Why: {POSTGRES_WHY}", quiet=30)
-    found = topic(scribe_list(t.room, t.scribe), "postgres")
+    found = postgres_decision(t.active())
     if found is None:
         raise SystemExit("Could not restore the Postgres decision.")
     return found
@@ -101,6 +111,18 @@ def ensure_postgres(t: Team) -> int:
 def quote(t: Team, number: int) -> str:
     replies = t.ask(t.scribe, f"quote {decision_id(number)} from the log, exactly as written, and nothing else.", quiet=25)
     return text_from(replies, t.scribe)
+
+
+def cites_reason(why: str, said: str) -> bool:
+    """Most of the reason's longer words appear in what the builder said."""
+    words = [w for w in re.findall(r"[a-z]+", why.lower()) if len(w) > 3]
+    low = said.lower()
+    return bool(words) and sum(w in low for w in words) >= 0.7 * len(words)
+
+
+def cites_decider(decider: str, said: str) -> bool:
+    """The decider is named as the decider, not just addressed."""
+    return bool(decider) and re.search(rf"(decided by|decider)\W+{re.escape(decider)}|{re.escape(decider)}\W+decided", said, re.I) is not None
 
 
 def scenario_1(t: Team) -> bool:
@@ -116,12 +138,13 @@ def scenario_1(t: Team) -> bool:
 def scenario_2(t: Team) -> bool:
     number = ensure_postgres(t)
     pg, entry = decision_id(number), quote(t, number)
-    why = (re.search(r"Why: (.+)", entry) or [None, ""])[1].strip()
-    decider = (re.search(r"Decided by: ([^,\n]+)", entry) or [None, ""])[1].strip()
+    why_match = re.search(r"Why: (.+)", entry)
+    decider_match = re.search(r"Decided by: ([^,\n]+)", entry)
+    why = why_match.group(1).strip() if why_match else ""
+    decider = decider_match.group(1).strip() if decider_match else ""
     replies = t.ask(t.builder, MONGO_REQUEST)
     said = text_from(replies, t.builder)
-    reason = bool(why) and why.lower().rstrip(".")[-20:] in said.lower()
-    ok = pg in said and reason and bool(decider) and decider in said and not files_from(replies, t.builder)
+    ok = pg in said and cites_reason(why, said) and cites_decider(decider, said) and not files_from(replies, t.builder)
     t.check(f"challenges, citing {pg}, its reason, and {decider or 'its decider'}, with no files", ok, replies)
     t.ask(t.builder, "drop the MongoDB request. Do not make that change.", quiet=25)
     return ok
@@ -129,26 +152,36 @@ def scenario_2(t: Team) -> bool:
 
 def scenario_3(t: Team) -> bool:
     pg = decision_id(ensure_postgres(t))
-    new = decision_id(max(scribe_list(t.room, t.scribe)) + 1)
-    t.ask(t.builder, MONGO_REQUEST)
+    new = decision_id(max(t.active()) + 1)
+    challenge = t.ask(t.builder, MONGO_REQUEST)
+    challenged = pg in text_from(challenge, t.builder) and not files_from(challenge, t.builder)
     replies = t.ask(t.builder, OVERRIDE, wait=[t.builder, t.scribe], timeout=900, quiet=60)
     record = next((r for r in replies if r.author == t.scribe and f"{new} | ACTIVE" in r.text), None)
-    superseded = record is not None and f"Supersedes: {pg}" in text_from(replies, t.scribe)
+    superseded = record is not None and f"Supersedes: {pg}" in record.text
     file_posts = [r for r in replies if r.author == t.builder and r.files]
     after = record is not None and bool(file_posts) and all(r.at > record.at for r in file_posts)
-    ok = t.check(f"the scribe records {new}, superseding {pg}, and only then the builder posts its work", superseded and after, replies)
+    ok = t.check(
+        f"challenged first; then the scribe records {new}, superseding {pg}, and only then the builder posts its work",
+        challenged and superseded and after,
+        challenge + replies,
+    )
     ensure_postgres(t)
     return ok
 
 
 def scenario_4(t: Team) -> bool:
-    new = decision_id(max(scribe_list(t.room, t.scribe)) + 1)
+    number = max(t.active()) + 1
+    new = decision_id(number)
     asked = t.ask(t.scribe, "record: Use tabs to indent SQL files.", quiet=25)
     said = text_from(asked, t.scribe).lower()
     asks = ("why" in said or "reason" in said) and "?" in said and new.lower() not in said
+    waited = number not in t.active()
     recorded = t.ask(t.scribe, "Why: our editor settings use tabs.", quiet=25)
-    wrote = f"{new} | ACTIVE" in text_from(recorded, t.scribe)
-    ok = t.check(f"asks for the missing reason before writing, then records {new}", asks and wrote, asked + recorded)
+    entry = quote(t, number)
+    wrote = f"{new} | ACTIVE" in entry and "tabs" in entry.lower() and "editor settings" in entry.lower()
+    ok = t.check(f"asks for the missing reason, writes nothing meanwhile, then records {new} with it", asks and waited and wrote, asked + recorded)
+    # Nothing existed on this topic before, so the run leaves "No rule on SQL
+    # indentation" active in its place: the nearest the log has to removal.
     if wrote:
         t.ask(t.scribe, f"supersede {new} with: No rule on SQL indentation. Why: the scenario tests restore the log after each run.", quiet=25)
     return ok
@@ -162,21 +195,22 @@ def scenario_5(t: Team) -> bool:
 
 def scenario_6(t: Team) -> bool:
     pg = decision_id(ensure_postgres(t))
-    t.reset(t.scribe)
+    was_reset = t.reset(t.scribe)
     replies = t.ask(t.scribe, "what did we decide about the database?", quiet=25)
     said = text_from(replies, t.scribe)
-    return t.check(f"after !reset, quotes {pg} on the database", pg in said and "postgres" in said.lower(), replies)
+    ok = was_reset and pg in said and PG_MARK in said.lower()
+    return t.check(f"after a confirmed !reset, quotes {pg}, Postgres as the primary database", ok, replies)
 
 
 RUN = {1: scenario_1, 2: scenario_2, 3: scenario_3, 4: scenario_4, 5: scenario_5, 6: scenario_6}
 
 
-def load_results(out) -> dict[str, dict[str, bool]]:
+def load_results(out: pathlib.Path) -> dict[str, dict[str, bool]]:
     path = out / "results.json"
     return json.loads(path.read_text()) if path.exists() else {}
 
 
-def write_table(out, results: dict[str, dict[str, bool]]) -> None:
+def write_table(out: pathlib.Path, results: dict[str, dict[str, bool]]) -> None:
     runs = sorted({int(r) for per in results.values() for r in per})
     head = "| # | Human says | Expected | " + " | ".join(f"Run {r}" for r in runs) + " | Passed |"
     rule = "|---|---|---|" + "---|" * len(runs) + "---|"
@@ -195,8 +229,8 @@ def write_table(out, results: dict[str, dict[str, bool]]) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--team", required=True)
-    ap.add_argument("--only", default="1,2,3,4,5,6", help="scenario numbers, such as 2,3,6")
-    ap.add_argument("--runs", default="1,2,3", help="run numbers to fill, such as 2")
+    ap.add_argument("--only", default=",".join(map(str, SCENARIOS)), help="scenarios to run, such as 2,3,6")
+    ap.add_argument("--runs", default="1,2,3", help="which runs to fill, by run number: 1,2,3 runs each scenario three times; 2 reruns run 2 only")
     ap.add_argument("--out", type=pathlib.Path, default=REPO / "results", help="folder for results and transcripts")
     args = ap.parse_args()
     out = args.out
