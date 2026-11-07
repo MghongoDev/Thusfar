@@ -17,6 +17,7 @@ import json
 import os
 import re
 import pathlib
+import shutil
 import time
 import urllib.error
 import urllib.request
@@ -91,8 +92,12 @@ class Room:
             return resp.read()
 
     def save_run(self, since: int, folder: pathlib.Path) -> None:
-        """Save every post after `since`, the human's included, as a transcript, with the files posted."""
-        folder.mkdir(parents=True, exist_ok=True)
+        """Save every post after `since`, the human's included, as a transcript, with the files posted.
+
+        The folder is emptied first, so a rerun leaves no files from the run it replaces.
+        """
+        shutil.rmtree(folder, ignore_errors=True)
+        folder.mkdir(parents=True)
         data = self._get(f"/channels/{self.channel['id']}/posts?since={since}")
         posts = sorted((data["posts"][pid] for pid in data["order"]), key=lambda p: p["create_at"])
         lines = []
@@ -172,7 +177,9 @@ class Room:
         """Wait until every agent in `agents` has replied, then until the room goes quiet.
 
         Agents often post a progress line before the real answer, so we keep
-        reading until no new reply has arrived for `quiet` seconds.
+        reading until no new reply has arrived for `quiet` seconds. Switch
+        edits one "**Working…" post in place while an agent works, so the
+        room is not quiet while any such post is still open.
         """
         deadline = time.monotonic() + timeout
         replies: list[Reply] = []
@@ -180,7 +187,10 @@ class Room:
         while time.monotonic() < deadline:
             fresh = self.replies_since(since)
             if len(fresh) > len(replies):
-                replies, last_new = fresh, time.monotonic()
+                last_new = time.monotonic()
+            replies = fresh
+            if any(r.text.strip().startswith("**Working") for r in replies):
+                last_new = time.monotonic()
             heard = all(any(r.author == a and (r.files or is_message(r.text)) for r in replies) for a in agents)
             if heard and time.monotonic() - last_new >= quiet:
                 break

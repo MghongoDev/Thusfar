@@ -45,7 +45,7 @@ The checks post to a Thusfar room as you would, wait for the agents, and test th
    python3 tests/scenarios.py --team check1
    ```
 
-   Each scenario runs on its own, with the builder's context reset first. The runs can share one room: each scenario finds the active decision on its topic from the scribe's `list`, and puts the database decision back after an override. Scenario 4 leaves a "No rule on SQL indentation" decision active each run, which no other scenario reads. To rerun one result, give its scenario and run number, such as `--only 3 --runs 2`. The results table is `results/results.md`, and each run's transcript and files are in `results/runs/`.
+   Each scenario runs on its own, with the builder's context reset first. The runs can share one room: each scenario finds the active decision on its topic from the scribe's `list`, and puts the database decision back after an override. Scenario 4 leaves a "No rule on SQL indentation" decision active each run, which no other scenario reads. To rerun one result, give its scenario and run number, such as `--only 3 --runs 2`; the rerun replaces that run's result and its folder. The results table is `results/results.md`, and each run's transcript and files are in `results/runs/`.
 
 Each check prints `PASS` or `FAIL`, then every reply it saw. Each script exits with 0 only when all its checks pass.
 
