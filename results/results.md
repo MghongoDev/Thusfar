@@ -1,6 +1,6 @@
 # Scenario results
 
-The transcript and files for scenario N, run R are in `runs/sN-rR/`.
+The transcript and files for scenario N, run R are in `runs/sN-rR/`. A rerun of a scenario and run number replaces its result, so each cell is the latest result for that run.
 
 | # | Human says | Expected | Run 1 | Run 2 | Run 3 | Passed |
 |---|---|---|---|---|---|---|

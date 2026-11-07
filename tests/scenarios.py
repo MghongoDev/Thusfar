@@ -222,7 +222,8 @@ def write_table(out: pathlib.Path, results: dict[str, dict[str, bool]]) -> None:
     body = "\n".join([head, rule, *rows])
     (out / "results.md").write_text(
         "# Scenario results\n\nThe transcript and files for scenario N, run R are in "
-        "`runs/sN-rR/`.\n\n" + body + "\n"
+        "`runs/sN-rR/`. A rerun of a scenario and run number replaces its result, so "
+        "each cell is the latest result for that run.\n\n" + body + "\n"
     )
 
 

@@ -48,7 +48,7 @@ Relevant decisions: none relevant
 
 Here's a .gitignore for a Python project. It ignores caches, build output, virtual environments, .env files (it keeps .env.example), test and coverage output, type-checker caches, and editor/OS files. No decisions shaped it, since none of them are about this.
 
-_Posted file: [.gitignore](.gitignore)_
+_Posted file: [dot.gitignore](dot.gitignore)_
 
 **user:**
 

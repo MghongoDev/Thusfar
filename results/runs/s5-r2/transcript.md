@@ -14,4 +14,4 @@ Relevant decisions: none relevant
 
 Here's the .gitignore for a Python project. It ignores bytecode and caches, build and packaging output, virtual environments, .env files (it keeps .env.example), test and coverage output, type-checker and linter caches, Jupyter checkpoints, logs, and editor and OS clutter. No decisions shaped it: it adds no dependency, so D-003 doesn't apply. I haven't tested the rules against a real repo.
 
-_Posted file: [.gitignore](.gitignore)_
+_Posted file: [dot.gitignore](dot.gitignore)_

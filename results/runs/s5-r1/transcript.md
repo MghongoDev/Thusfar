@@ -14,4 +14,4 @@ Relevant decisions: none relevant
 
 Here's a .gitignore for a Python project. It covers bytecode and caches, build output, virtualenvs, .env files (keeping .env.example), test and coverage output, type-checker and linter caches, Jupyter checkpoints, logs, and editor and OS files. No decisions shaped it: it adds no dependency.
 
-_Posted file: [.gitignore](.gitignore)_
+_Posted file: [dot.gitignore](dot.gitignore)_

@@ -89,8 +89,12 @@ One of the six behaviours the spec tests through the room, such as an override. 
 _Avoid_: test case, story
 
 **Results table**:
-The table of pass or fail for every run of every scenario, in `results/results.md`.
+The table of pass or fail for every run of every scenario, in `results/results.md`. Each cell holds the latest result for that run.
 _Avoid_: scoreboard, report
+
+**Rerun**:
+Running one scenario and run number again, such as scenario 3, run 2, after a fix. The new result replaces the old one in the results table, and the new transcript replaces the old one.
+_Avoid_: retry, retake
 
 **Room check**:
 A test that posts to the room as a human would and checks only what a human would see in the replies.

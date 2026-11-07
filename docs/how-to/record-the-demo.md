@@ -1,10 +1,10 @@
 # Record the demo
 
-The demo shows, in two to three minutes, a builder that checks the team's decisions before it acts: it challenges a request that breaks one, waits for a human override, and goes ahead once the scribe has recorded the change. Every message is pinned below, so the demo runs in one take.
+The demo shows, in two to three minutes, a builder that checks the team's decisions before it acts: it challenges a request that breaks one, waits for a human override, and goes ahead once the scribe has recorded the change. Every message is written out below, so the demo runs in one take.
 
 ## Before you start
 
-- Create a room made fresh from the template with `team` set to `thusfar`, as in the [tutorial](../tutorials/your-first-thusfar-room.md). Wait until the scribe lists D-001 to D-004.
+- Create a fresh room from the template, with `team` set to `thusfar`, as in the [tutorial](../tutorials/your-first-thusfar-room.md). Wait until the scribe lists D-001 to D-004.
 - Do not post anything else in the room first. The demo expects the four seed decisions and nothing after them.
 - Open Mattermost on the `thusfar-decisions` channel, full screen, and start the screen recorder.
 
@@ -22,6 +22,8 @@ Post each message exactly as written. Wait for the reply described before you po
 | 4 | `@thusfar-builder ok sure` | The builder says that is not an explicit override and asks again. |
 | 5 | `@thusfar-builder override, the team approved` | The builder asks the scribe to supersede D-001, quoting your request and your override. The scribe records D-005, which supersedes D-001, with you as decider, and tells the builder. The builder then posts the MongoDB files. |
 | 6 | `@thusfar-scribe list` | D-005 is listed. D-001 is not, since it is superseded. |
+| 7 | `!reset @thusfar-scribe` | The scribe says its session has been reset. Its context is now empty. |
+| 8 | `@thusfar-scribe what did we decide about the database?` | The scribe quotes D-005, read back from the log, and says it replaced D-001. |
 
 ## What to say over it
 
@@ -30,6 +32,7 @@ Post each message exactly as written. Wait for the reply described before you po
 - At step 4: "A vague reply is not an override."
 - At step 5: "Only a human changes a decision. The builder quotes my words to the scribe, and the scribe records who changed it."
 - At step 6: "The old decision stays in the log, marked superseded, so the history stays readable."
+- At step 8: "The scribe has just lost its memory, but the log has not. The decision is still there, with who made it."
 
 ## If something goes wrong
 

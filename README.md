@@ -4,7 +4,7 @@ Teams make decisions in chat, and the chat scrolls them away. Agents in the same
 
 Thusfar is a [Switch](https://switchagents.ai) room with two agents. The **scribe** writes each decision to a decision log: what the team chose, why, and who decided. The **builder** does real tasks, but reads the log first, and challenges any request that breaks an active decision until a human overrides it. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
 
-> **Status: Phases 1 to 4 of 5 done.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task, challenges a request that conflicts with one, and goes ahead on a human's override. All six scenarios pass three runs out of three. The demo video and submission come next. See [Status](#status).
+> **Status: Phases 1 to 4 of 5 done.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task, challenges a request that conflicts with one, and goes ahead on a human's override. All six scenarios pass three runs out of three, one run after a rerun. The demo video and submission come next. See [Status](#status).
 
 ## Quick start
 
@@ -56,7 +56,7 @@ You (a human, in Mattermost)
 
 ## Why Switch is central
 
-Thusfar is a Switch template and nothing else: no server, no database, and no code that runs. Each part of it is a Switch feature.
+Thusfar is a Switch template and nothing else: no server, no database, and no service code. Each part of it is a Switch feature.
 
 - **Rooms** put the team's humans and both agents in one place, with one shared history.
 - **Room documents** hold the decision log. Every agent in the room can read one, even right after `!reset` clears its context, and only the agent that created it can change it. That makes the scribe the log's one writer ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)).

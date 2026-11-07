@@ -8,7 +8,7 @@ Settings come from `.env.local` at the repo root, which git ignores:
 MM_URL, and either MM_TOKEN (a personal access token) or MM_USER and
 MM_PASSWORD.
 
-Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added saving a run; #14 added scribe_list and waits for real messages. ADRs: 0001, 0002. Reused by #5 (Phase 4).
+Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added saving a run; #14 added scribe_list and waits for real messages; #15 added waiting out open "**Working…" posts, which Switch edits in place, emptying a run's folder before saving it, and renaming posted dotfiles. ADRs: 0001, 0002. Reused by #5 (Phase 4).
 """
 
 from __future__ import annotations
@@ -108,6 +108,8 @@ class Room:
             lines.append(f"**{who}:**\n\n{p['message'].strip()}\n")
             for fid, name in zip(p.get("file_ids") or [], _file_names(p)):
                 name = pathlib.Path(name).name or "file"
+                if name.startswith("."):
+                    name = "dot" + name  # so a posted .gitignore is not a live one in this repo
                 (folder / name).write_bytes(self.download(fid))
                 lines.append(f"_Posted file: [{name}]({name})_\n")
         (folder / "transcript.md").write_text("\n".join(lines))
@@ -189,7 +191,7 @@ class Room:
             if len(fresh) > len(replies):
                 last_new = time.monotonic()
             replies = fresh
-            if any(r.text.strip().startswith("**Working") for r in replies):
+            if any(is_working(r.text) for r in replies):
                 last_new = time.monotonic()
             heard = all(any(r.author == a and (r.files or is_message(r.text)) for r in replies) for a in agents)
             if heard and time.monotonic() - last_new >= quiet:
@@ -205,11 +207,18 @@ def _file_names(post: dict) -> tuple[str, ...]:
     return tuple("(unnamed file)" for _ in post.get("file_ids") or [])
 
 
+PROGRESS = ("**Worked for", "**Working", "Starting a session", "Resetting my session")
+
+
+def is_working(text: str) -> bool:
+    """Switch's open progress post: the agent is still at work."""
+    return text.strip().startswith("**Working")
+
+
 def is_message(text: str) -> bool:
     """A real message, not one of Switch's progress lines."""
     t = text.strip()
-    progress = ("**Worked for", "**Working", "Starting a session", "Resetting my session")
-    return bool(t) and not t.startswith(progress)
+    return bool(t) and not t.startswith(PROGRESS)
 
 
 def files_from(replies: list[Reply], agent: str) -> list[str]:
