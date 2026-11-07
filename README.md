@@ -30,7 +30,7 @@ You (a human, in Mattermost)
 
 - The room holds the log. It is a room document named `DECISIONS`.
 - Only the scribe writes to it. Switch lets only the agent that made a document change it ([ADR 0001](docs/adr/0001-decision-log-is-a-scribe-owned-room-document.md)). The kickoff fills it with four seed decisions. `@thusfar-scribe record:` adds a decision, `list` shows the active ones, and `supersede D-nnn with:` replaces one.
-- The builder reads the log before every task and names the decisions that bear on it. It challenges a conflicting request and asks a human for an override; the tests for that arrive with the rest of Phase 3.
+- The builder reads the log before every task and names the decisions that bear on it. It challenges a conflicting request, citing the decision ID, reason, and decider, and asks a human for an override. When unsure, it says so and asks. A human's override goes to the scribe, which supersedes the decision.
 
 [How Thusfar works](docs/explanation/how-thusfar-works.md) explains the design.
 

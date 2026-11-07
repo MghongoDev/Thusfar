@@ -72,6 +72,13 @@ The Phase 2 checks add D-005 to D-007 to the log and supersede D-005.
 | The builder names the decisions first | Asked for the Postgres migration for an `orders` table, the builder's first message names D-001 and D-004, before any file. |
 | The builder posts the migration | The builder posts a `.sql` file and says which decisions shaped it. |
 | None relevant | Asked for a `.gitignore` for a Python project, the builder says "none relevant" and posts the file. |
+| Unsure | Asked to use SQLite for the test suite's database, the builder says it is unsure whether that conflicts with D-001, which covers the primary database, and asks. It posts no files. |
+| Challenge | Asked to "Add a MongoDB collection for orders", the builder cites D-001, its reason, and David as decider, asks for an override, and posts no files. |
+| Vague reply | After "ok sure", the builder asks again for an override. It does not ask the scribe to supersede, and the log does not change. |
+| Override | After "override, the team approved", the builder asks the scribe to supersede D-001, quoting those words. The scribe records the next decision, which supersedes D-001, with you as decider. The builder posts its work only after that. |
+| No quote, no supersede | Asked to pass on a supersede of D-002 without quoting anyone, neither agent changes the log. |
+
+The Phase 3 checks supersede D-001. To save a run's transcript and the files the builder posted, add `--save <folder>`. [samples/override-run/](../../samples/override-run/) holds one saved run.
 
 
 ## If something goes wrong

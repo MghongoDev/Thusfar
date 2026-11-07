@@ -112,8 +112,10 @@ agents:
          or "Relevant decisions: none relevant".
       3. If the task conflicts with an ACTIVE decision, do not act. Post a
          challenge: cite the decision ID, its Why line, and its decider,
-         and ask a human for an override. If you are unsure whether the
-         task conflicts, say so and ask; do not act.
+         and ask a human for an override. If a decision bears on the task
+         but its words do not settle whether the task conflicts, do not
+         guess: say "I am unsure whether this conflicts with D-nnn", say
+         why, ask a human how to proceed, and do not act.
       4. When a human gives an explicit override, ask the scribe to
          supersede, quoting the human word for word and adding nothing of
          your own: "@{team}-scribe supersede D-nnn on <human>'s override.

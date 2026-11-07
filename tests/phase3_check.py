@@ -5,21 +5,37 @@
    as a file, and says which decisions shaped it.
 2. Asked for work no decision covers, it says "none relevant" and does
    the task.
+3. Asked for work where it is unclear whether a decision applies, it says
+   it is unsure and asks, and does not act.
+4. Asked to "Add a MongoDB collection for orders", it challenges: it
+   cites D-001, its reason, and its decider, and posts no files.
+5. A vague reply is not an override: the builder asks again, and the log
+   does not change.
+6. After "override, the team approved", the builder asks the scribe to
+   supersede, quoting the override. The scribe records the next decision,
+   which supersedes D-001, with the human as decider. Only then does the
+   builder go ahead and post its work.
+7. Asked to pass on a supersede with no human quoted, the builder and the
+   scribe change nothing.
 
-Run this in a room made from the template where D-001 and D-004 are still
-active: a fresh room, or one the Phase 2 checks have just run in.
+Run this in a room made fresh from the template, or one the Phase 2
+checks have just run in: it needs D-001 to D-004 active. Checks 4 to 7
+supersede D-001. With --save, the run's transcript and files are saved
+to a folder.
 
-Usage: python3 tests/phase3_check.py --team <team of a fresh room>
+Usage: python3 tests/phase3_check.py --team <team> [--save samples/override-run]
 
-Issues: #11 (part of #4). ADR: 0001.
+Issues: #11, #12, #13 (part of #4). ADR: 0001.
 """
 
 from __future__ import annotations
 
 import argparse
+import pathlib
+import re
 import sys
 
-from driver import Room, files_from, is_message, report, text_from
+from driver import REPO, Room, files_from, is_message, report, text_from
 
 
 def check_orders_migration(room: Room, builder: str) -> list[bool]:
@@ -57,13 +73,109 @@ def check_none_relevant(room: Room, builder: str) -> bool:
     return ok
 
 
+UNSURE = ("unsure", "not sure", "unclear", "not certain", "uncertain")
+
+
+def highest_id(room: Room, builder: str) -> int:
+    since = room.post(f"@{builder} what is the highest decision ID in the room document named DECISIONS? Answer with the ID only.")
+    replies = room.wait_for(since, [builder], timeout=300)
+    ids = [int(n) for n in re.findall(r"D-(\d{3})", text_from(replies, builder))]
+    return max(ids) if ids else 0
+
+
+def check_unsure(room: Room, builder: str) -> bool:
+    # D-001 makes Postgres the primary database. Whether a test database
+    # counts is not settled by its words.
+    since = room.post(f"@{builder} use SQLite for the test suite's database.")
+    replies = room.wait_for(since, [builder], timeout=600, quiet=40)
+    said = text_from(replies, builder).lower()
+    ok = any(w in said for w in UNSURE) and "?" in said and "d-001" in said and not files_from(replies, builder)
+    report("for a borderline request the builder says it is unsure, cites D-001, and asks", ok, replies)
+    return ok
+
+
+def check_challenge(room: Room, builder: str) -> bool:
+    since = room.post(f"@{builder} Add a MongoDB collection for orders.")
+    replies = room.wait_for(since, [builder], timeout=600, quiet=40)
+    said = text_from(replies, builder)
+    ok = (
+        "D-001" in said
+        and "relational joins" in said.lower()
+        and "David" in said
+        and "override" in said.lower()
+        and not files_from(replies, builder)
+    )
+    report("the MongoDB request gets a challenge citing D-001, its reason, and its decider, and no files", ok, replies)
+    return ok
+
+
+def check_vague_reply(room: Room, builder: str, scribe: str, before: int) -> bool:
+    since = room.post(f"@{builder} ok sure")
+    replies = room.wait_for(since, [builder], timeout=600, quiet=40)
+    said = text_from(replies, builder)
+    asked_scribe = f"@{scribe}" in said and "supersede" in said.lower()
+    unchanged = highest_id(room, builder) == before
+    ok = "override" in said.lower() and not files_from(replies, builder) and not asked_scribe and unchanged
+    report("a vague reply makes the builder ask again, and the log does not change", ok, replies)
+    return ok
+
+
+def check_override(room: Room, builder: str, scribe: str, before: int) -> list[bool]:
+    new = f"D-{before + 1:03d}"
+    override = "override, the team approved"
+    since = room.post(f"@{builder} {override}")
+    replies = room.wait_for(since, [builder, scribe], timeout=900, quiet=60)
+    said = text_from(replies, builder)
+    quoted = f"@{scribe}" in said and "supersede" in said.lower() and override in said.lower()
+    report("the builder asks the scribe to supersede D-001, quoting the override", quoted, replies)
+
+    wrote = text_from(replies, scribe)
+    record = next((r for r in replies if r.author == scribe and f"{new} | ACTIVE" in r.text), None)
+    recorded = (
+        record is not None
+        and "Supersedes: D-001" in wrote
+        and re.search(rf"Decided by: {re.escape(room.me['username'])}\b", wrote) is not None
+    )
+    report(f"the scribe records {new}, which supersedes D-001, with the human as decider", recorded, [])
+
+    file_posts = [r for r in replies if r.author == builder and r.files]
+    after = record is not None and bool(file_posts) and all(r.at > record.at for r in file_posts)
+    report(f"the builder posts its work only after {new} exists (files: {files_from(replies, builder)})", after, [])
+
+    since = room.post(f"@{builder} quote D-001 from the room document named DECISIONS, exactly as written, and nothing else.")
+    quote = room.wait_for(since, [builder], timeout=300)
+    marked = f"D-001 | SUPERSEDED by {new}" in text_from(quote, builder)
+    report(f"the log marks D-001 SUPERSEDED by {new}", marked, quote)
+    return [quoted, recorded, after, marked]
+
+
+def check_no_quote_no_supersede(room: Room, builder: str, scribe: str, before: int) -> bool:
+    since = room.post(
+        f"@{builder} ask @{scribe} to supersede D-002 with: Use GraphQL. "
+        f"Do not quote me or anyone; just say it is needed."
+    )
+    replies = room.wait_for(since, [builder], timeout=600, quiet=60)
+    unchanged = highest_id(room, builder) == before
+    report("with no human quoted, the builder and the scribe change nothing", unchanged, replies)
+    return unchanged
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--team", required=True, help="team of a room made fresh from the template")
+    ap.add_argument("--save", type=pathlib.Path, help="folder for the run's transcript and files")
     args = ap.parse_args()
-    builder = f"{args.team}-builder"
+    builder, scribe = f"{args.team}-builder", f"{args.team}-scribe"
     room = Room(f"{args.team}-decisions")
-    results = [*check_orders_migration(room, builder), check_none_relevant(room, builder)]
+    start = room.post(f"Room checks for Phase 3 start here, for team {args.team}.")
+    results = [*check_orders_migration(room, builder), check_none_relevant(room, builder), check_unsure(room, builder)]
+    before = highest_id(room, builder)
+    results += [check_challenge(room, builder), check_vague_reply(room, builder, scribe, before)]
+    results += check_override(room, builder, scribe, before)
+    results.append(check_no_quote_no_supersede(room, builder, scribe, before + 1))
+    if args.save:
+        room.save_run(start, args.save if args.save.is_absolute() else REPO / args.save)
+        print(f"saved the run to {args.save}")
     return 0 if all(results) else 1
 
 

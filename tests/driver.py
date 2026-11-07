@@ -53,6 +53,7 @@ class Reply:
     text: str
     at: int  # Mattermost create_at, in milliseconds
     files: tuple[str, ...] = ()  # names of files attached to the post
+    file_ids: tuple[str, ...] = ()
 
 
 class Room:
@@ -80,6 +81,30 @@ class Room:
                 return resp, (json.loads(payload) if payload else None)
         except urllib.error.HTTPError as err:
             raise SystemExit(f"{method} {path} failed: {err.code} {err.read()[:300]!r}")
+
+    def download(self, file_id: str) -> bytes:
+        """The bytes of a file attached to a post."""
+        req = urllib.request.Request(f"{self.base}/files/{file_id}")
+        req.add_header("Authorization", f"Bearer {self.token}")
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            return resp.read()
+
+    def save_run(self, since: int, folder: pathlib.Path) -> None:
+        """Save every post after `since`, the human's included, as a transcript, with the files posted."""
+        folder.mkdir(parents=True, exist_ok=True)
+        data = self._get(f"/channels/{self.channel['id']}/posts?since={since}")
+        posts = sorted((data["posts"][pid] for pid in data["order"]), key=lambda p: p["create_at"])
+        lines = []
+        for p in posts:
+            if p["create_at"] <= since or p.get("type", "") != "" or not (is_message(p["message"]) or p.get("file_ids")):
+                continue
+            who = self.me["username"] if p["user_id"] == self.me["id"] else self._author(p)
+            lines.append(f"**{who}:**\n\n{p['message'].strip()}\n")
+            for fid, name in zip(p.get("file_ids") or [], _file_names(p)):
+                name = pathlib.Path(name).name or "file"
+                (folder / name).write_bytes(self.download(fid))
+                lines.append(f"_Posted file: [{name}]({name})_\n")
+        (folder / "transcript.md").write_text("\n".join(lines))
 
     def _get(self, path: str):
         return self._request("GET", path)[1]
@@ -129,7 +154,7 @@ class Room:
         data = self._get(f"/channels/{self.channel['id']}/posts?since={since}")
         posts = [data["posts"][pid] for pid in data["order"]]
         out = [
-            Reply(self._author(p), p["message"], p["create_at"], _file_names(p))
+            Reply(self._author(p), p["message"], p["create_at"], _file_names(p), tuple(p.get("file_ids") or ()))
             for p in posts
             if p["create_at"] > since and p["user_id"] != self.me["id"] and p.get("type", "") == ""
         ]
