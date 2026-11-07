@@ -4,7 +4,7 @@ Teams make decisions in chat, and the chat scrolls them away. Agents in the same
 
 Thusfar is a [Switch](https://switchagents.ai) room with two agents. When the build is done, the **scribe** will write each decision to a decision log, and the **builder** will do tasks, but read the log first and challenge any request that breaks an active decision. The name comes from "thus far": the log holds what the team has settled so far, and a human can change it.
 
-> **Status: Phases 2 and 3 of 5 done.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task and posts its work as files; its challenges are next. See [Status](#status).
+> **Status: Phases 2 and 3 of 5 done.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task, challenges a request that conflicts with one, and goes ahead on a human's override. Scenario tests come next. See [Status](#status).
 
 ## Quick start
 
