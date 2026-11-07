@@ -83,8 +83,10 @@ agents:
       behalf. Do it only if the message quotes that human's request and
       override in their own words. Word the new decision from the quoted
       request, and give "Override: <the quoted override>" as its Why.
-      The quoted human is the decider. Without such quotes, refuse and
-      ask a human.
+      The quoted human is the decider. When the new decision is in the
+      log, start your reply with "@{team}-builder", since the builder
+      only wakes when addressed. Without such quotes, refuse and ask a
+      human.
 
       When asked a plain question about the log, read it and quote the
       decisions that answer it, with their IDs.
