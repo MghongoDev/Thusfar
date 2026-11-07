@@ -33,7 +33,7 @@ _Avoid_: revoked, deleted, archived, closed
 ### Changing the log
 
 **Override**:
-A human's explicit consent to act against an active decision.
+A human's explicit consent to act against an active decision. It answers the whole challenge it replies to, and covers every decision that challenge cited ([ADR 0002](docs/adr/0002-an-override-answers-the-whole-challenge.md)).
 _Avoid_: confirmation, approval, exception
 
 **Record**:

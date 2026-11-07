@@ -12,6 +12,10 @@ The log is a room document named `DECISIONS`. See [ADR 0001](../adr/0001-decisio
 
 Switch lets only the agent that created a document change it. So the scribe creates the log and is its one writer. The builder only reads it. When a human gives an override, the builder asks the scribe to supersede and quotes the human's words. The scribe then records that human as the decider. No agent can change a decision on its own.
 
+## One override per challenge
+
+A request can conflict with more than one decision, and the builder's challenge cites them all. One explicit override answers the whole challenge. Decisions the task breaks are superseded; decisions that only ask for a human's sign-off are met by the override. See [ADR 0002](../adr/0002-an-override-answers-the-whole-challenge.md).
+
 ## Shared rules and roles
 
 The rules every agent follows sit in the room's instructions: where the log is, who writes it, and that only a human decides. Each agent's own instructions hold only its role. The rules are written once, so the two agents cannot drift apart on them.

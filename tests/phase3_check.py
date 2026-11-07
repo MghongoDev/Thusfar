@@ -19,7 +19,8 @@
    scribe change nothing.
 
 Run this in a room made fresh from the template, or one the Phase 2
-checks have just run in: it needs D-001 to D-004 active. Checks 4 to 7
+checks have just run in: it needs D-001 to D-004 active. It first waits
+for the room to go quiet and resets both agents. Checks 4 to 7
 supersede D-001. With --save, the run's transcript and files are saved
 to a folder.
 
@@ -91,6 +92,10 @@ def check_unsure(room: Room, builder: str) -> bool:
     said = text_from(replies, builder).lower()
     ok = any(w in said for w in UNSURE) and "?" in said and "d-001" in said and not files_from(replies, builder)
     report("for a borderline request the builder says it is unsure, cites D-001, and asks", ok, replies)
+
+    # Withdraw the request, so no task is left waiting on D-001.
+    since = room.post(f"@{builder} drop the SQLite request. Leave the test database as it is.")
+    room.wait_for(since, [builder], timeout=300)
     return ok
 
 
@@ -168,6 +173,12 @@ def main() -> int:
     builder, scribe = f"{args.team}-builder", f"{args.team}-scribe"
     room = Room(f"{args.team}-decisions")
     start = room.post(f"Room checks for Phase 3 start here, for team {args.team}.")
+    # Let the kickoff finish, then clear both agents' context so earlier
+    # chat in the room cannot leave a task waiting.
+    room.wait_for(start, [], timeout=600, quiet=60)
+    for agent in (scribe, builder):
+        since = room.post(f"!reset @{agent}")
+        room.wait_for(since, [], timeout=60, quiet=20)
     results = [*check_orders_migration(room, builder), check_none_relevant(room, builder), check_unsure(room, builder)]
     before = highest_id(room, builder)
     results += [check_challenge(room, builder), check_vague_reply(room, builder, scribe, before)]

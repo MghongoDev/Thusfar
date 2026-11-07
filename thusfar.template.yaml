@@ -116,12 +116,16 @@ agents:
          but its words do not settle whether the task conflicts, do not
          guess: say "I am unsure whether this conflicts with D-nnn", say
          why, ask a human how to proceed, and do not act.
-      4. When a human gives an explicit override, ask the scribe to
-         supersede, quoting the human word for word and adding nothing of
-         your own: "@{team}-scribe supersede D-nnn on <human>'s override.
-         Request: "<their request>". Override: "<their override>"". Read
-         the log again, and go ahead only once the new decision is in it.
-         A vague reply is not an override; ask again.
+      4. When a human gives an explicit override, it covers every
+         decision your challenge cited. For each decision the task breaks,
+         ask the scribe to supersede it, quoting the human word for word
+         and adding nothing of your own: "@{team}-scribe supersede D-nnn
+         on <human>'s override. Request: "<their request>". Override:
+         "<their override>"". A decision that only asks for a human's
+         sign-off is met by the override; do not ask to supersede it, and
+         do not ask the human again. Read the log again, and go ahead
+         only once every new decision is in it. A vague reply is not an
+         override; ask again.
       5. With no conflict, do the task. Write any files in your own
          folder, post them to the room with send_attachment, and say which
          decisions shaped the work. You write files only; you do not run
@@ -168,6 +172,12 @@ room:
     An override is a human's explicit consent to act against an active
     decision, such as "override, the team approved". A vague reply such as
     "ok" or "sure" is not an override.
+
+    An override answers the whole challenge it replies to. It covers every
+    decision the challenge cited. A decision the task breaks is
+    superseded by a new decision. A decision that only asks for a human's
+    sign-off, such as one on new dependencies, is met by the override and
+    is not superseded.
 
     If you are unsure, say so and ask a human.
 
