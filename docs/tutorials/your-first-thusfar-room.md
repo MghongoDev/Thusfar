@@ -4,7 +4,7 @@ In this tutorial you create a Thusfar room from the template and meet its two ag
 
 ## What you need
 
-- Switch Console with its local server running. On Linux, follow [Install Switch Console on Linux](../how-to/install-switch-console-on-linux.md).
+- Switch Console with its local server running, and Docker. On macOS or Windows, use the install links in the [README quick start](../../README.md#quick-start). On Linux, follow [Install Switch Console on Linux](../how-to/install-switch-console-on-linux.md).
 - Claude Code, signed in, and shown as signed in under **Settings**, **Agent providers**.
 - A clone of this repo.
 

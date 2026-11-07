@@ -8,7 +8,30 @@ Thusfar is a [Switch](https://switchagents.ai) room with two agents. The **scrib
 
 ## Quick start
 
-You need Switch Console with its local server running, Docker, and Claude Code signed in. On Linux, see [Install Switch Console on Linux](docs/how-to/install-switch-console-on-linux.md) first.
+You need three things:
+
+- **Switch Console**, with its local server running.
+- **Docker**: Docker Desktop on macOS and Windows, or Docker Engine on Linux.
+- **Claude Code**, signed in.
+
+Install Switch Console for your platform:
+
+| Platform | Install |
+|---|---|
+| macOS | [Apple silicon](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-arm64.dmg) or [Intel](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.dmg). Open the `.dmg` and drag Switch Console to Applications. |
+| Windows | [Installer](https://github.com/sandbox-quantum/switch/releases/latest/download/switch-console-x64.exe), or the `.msi` from the [latest release](https://github.com/sandbox-quantum/switch/releases/latest). |
+| Linux | Follow [Install Switch Console on Linux](docs/how-to/install-switch-console-on-linux.md). It needs launch flags that the other platforms do not. |
+
+Install Claude Code, then run `claude` once to sign in:
+
+| Platform | Command |
+|---|---|
+| macOS or Linux | `curl -fsSL https://claude.ai/install.sh \| bash` |
+| Windows (PowerShell) | `irm https://claude.ai/install.ps1 \| iex` |
+
+Start Docker before you open Console. In Console, select **Get started**, then **On this computer**, then **Start**, and wait for "Local server is running".
+
+Thusfar has been tested on Fedora Linux only. The template uses no platform-specific feature, so it should work the same way on macOS and Windows. The room checks in `tests/` need Python 3; on Windows, run them with `py` in place of `python3`.
 
 1. Clone this repo.
 2. In Switch Console, open **Templates**, select **Import template**, and choose [`thusfar.template.yaml`](thusfar.template.yaml).
