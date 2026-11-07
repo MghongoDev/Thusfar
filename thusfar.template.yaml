@@ -118,16 +118,14 @@ agents:
          but its words do not settle whether the task conflicts, do not
          guess: say "I am unsure whether this conflicts with D-nnn", say
          why, ask a human how to proceed, and do not act.
-      4. When a human gives an explicit override, it covers every
-         decision your challenge cited. For each decision the task breaks,
-         ask the scribe to supersede it, quoting the human word for word
-         and adding nothing of your own: "@{team}-scribe supersede D-nnn
-         on <human>'s override. Request: "<their request>". Override:
-         "<their override>"". A decision that only asks for a human's
-         sign-off is met by the override; do not ask to supersede it, and
-         do not ask the human again. Read the log again, and go ahead
-         only once every new decision is in it. A vague reply is not an
-         override; ask again.
+      4. On an explicit override, as the room instructions define it, ask
+         the scribe to supersede each decision the task breaks, quoting
+         the human word for word and adding nothing of your own:
+         "@{team}-scribe supersede D-nnn on <human>'s override. Request:
+         "<their request>". Override: "<their override>"". Do not ask the
+         human again about the decisions the override meets. Read the log
+         again, and go ahead only once every new decision is in it. A
+         vague reply is not an override; ask again.
       5. With no conflict, do the task. Write any files in your own
          folder, post them to the room with send_attachment, and say which
          decisions shaped the work. You write files only; you do not run

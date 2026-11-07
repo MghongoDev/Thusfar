@@ -43,7 +43,7 @@ import pathlib
 import re
 import sys
 
-from driver import REPO, Room, files_from, is_message, report, text_from
+from driver import REPO, Room, files_from, is_message, report, scribe_list, text_from
 
 
 def check_orders_migration(room: Room, builder: str) -> list[bool]:
@@ -85,10 +85,7 @@ UNSURE = ("unsure", "not sure", "unclear", "not certain", "uncertain")
 
 
 def active_ids(room: Room, scribe: str) -> set[int]:
-    """The active decision IDs, from the scribe's `list` reply."""
-    since = room.post(f"@{scribe} list")
-    replies = room.wait_for(since, [scribe], timeout=300)
-    return {int(n) for n in re.findall(r"D-(\d{3})", text_from(replies, scribe))}
+    return set(scribe_list(room, scribe))
 
 
 def highest_id(room: Room, scribe: str) -> int:

@@ -14,6 +14,7 @@ Issues: #7 (Phase 1 close-out, part of #2); #11 added attached files; #13 added 
 from __future__ import annotations
 
 import json
+import re
 import os
 import pathlib
 import time
@@ -180,7 +181,7 @@ class Room:
             fresh = self.replies_since(since)
             if len(fresh) > len(replies):
                 replies, last_new = fresh, time.monotonic()
-            heard = all(any(r.author == a for r in replies) for a in agents)
+            heard = all(any(r.author == a and (r.files or is_message(r.text)) for r in replies) for a in agents)
             if heard and time.monotonic() - last_new >= quiet:
                 break
             time.sleep(poll)
@@ -197,7 +198,8 @@ def _file_names(post: dict) -> tuple[str, ...]:
 def is_message(text: str) -> bool:
     """A real message, not one of Switch's progress lines."""
     t = text.strip()
-    return bool(t) and not t.startswith("**Worked for") and not t.startswith("Starting a session")
+    progress = ("**Worked for", "**Working", "Starting a session", "Resetting my session")
+    return bool(t) and not t.startswith(progress)
 
 
 def files_from(replies: list[Reply], agent: str) -> list[str]:
@@ -216,3 +218,23 @@ def report(name: str, ok: bool, replies: list[Reply], width: int = 400) -> None:
     for r in replies:
         if r.text.strip():
             print(f"    {r.author}: {r.text[:width]!r}")
+
+
+def scribe_list(room: Room, scribe: str) -> dict[int, str]:
+    """The active decisions, from the scribe's `list` reply: decision ID number to its line.
+
+    The spec reads the log this way. The newest decision is always active,
+    so the highest ID here is the highest in the log.
+    """
+    since = room.post(f"@{scribe} list")
+    replies = room.wait_for(since, [scribe], timeout=300)
+    found: dict[int, str] = {}
+    for line in text_from(replies, scribe).splitlines():
+        m = re.search(r"D-(\d{3})", line)
+        if m:
+            found.setdefault(int(m.group(1)), line)
+    return found
+
+
+def decision_id(number: int) -> str:
+    return f"D-{number:03d}"
