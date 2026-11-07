@@ -6,7 +6,7 @@ Thusfar is a [Switch](https://switchagents.ai) room with two agents. The **scrib
 
 **Demo video (2 min 50 s):** [youtu.be/ztajvmzCVDg](https://youtu.be/ztajvmzCVDg). The builder challenges a MongoDB request that breaks a team decision, turns down a vague "ok sure", and goes ahead only after the scribe records a human override.
 
-> **Status: Phases 1 to 4 of 5 done; Phase 5 waits only on the clean-clone test.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task, challenges a request that conflicts with one, and goes ahead on a human's override. All six scenarios pass three runs out of three, one run after a rerun. The demo video is recorded, and Thusfar is submitted to Flip the Switch, Track 01. See [Status](#status).
+> **Status: all five phases done.** One template creates both agents and the room, with four seed decisions in the log. The scribe records, lists, and supersedes decisions. The builder names the decisions that bear on each task, challenges a request that conflicts with one, and goes ahead on a human's override. All six scenarios pass three runs out of three, one run after a rerun. The demo video is recorded, and Thusfar is submitted to Flip the Switch, Track 01. See [Status](#status).
 
 ## Quick start
 
@@ -114,7 +114,6 @@ The first full pass had one failure: scenario 3, run 2. The agents did the right
 | Set up a room for the first time | [Tutorial: your first Thusfar room](docs/tutorials/your-first-thusfar-room.md) |
 | Install Console on Linux | [How-to: install Switch Console on Linux](docs/how-to/install-switch-console-on-linux.md) |
 | Run the room checks | [How-to: run the room checks](docs/how-to/run-the-room-checks.md) |
-| Record the demo | [How-to: record the demo](docs/how-to/record-the-demo.md) |
 | Look up a template field | [Reference: the template](docs/reference/template.md) |
 | Understand the design | [Explanation: how Thusfar works](docs/explanation/how-thusfar-works.md) |
 | Learn the terms | [GLOSSARY.md](GLOSSARY.md) |
@@ -132,7 +131,7 @@ The build follows the spec in [issue #1](https://github.com/MghongoDev/Thusfar/i
 | 2. The scribe records decisions | [#3](https://github.com/MghongoDev/Thusfar/issues/3) | Done |
 | 3. The builder checks and challenges | [#4](https://github.com/MghongoDev/Thusfar/issues/4) | Done |
 | 4. Scenario tests through the room | [#5](https://github.com/MghongoDev/Thusfar/issues/5) | Done |
-| 5. README, demo, and submission | [#6](https://github.com/MghongoDev/Thusfar/issues/6) | In progress |
+| 5. README, demo, and submission | [#6](https://github.com/MghongoDev/Thusfar/issues/6) | Done |
 
 ## Cost
 
